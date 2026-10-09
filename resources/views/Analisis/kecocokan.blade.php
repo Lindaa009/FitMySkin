@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analisis Kecocokan - FitMySkin</title>
-    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Font: Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -14,7 +12,7 @@
 </head>
 <body class="bg-[#FEF8F5] text-[#1D1B1A] min-h-screen pb-12">
 
-    <!-- 1. NAVBAR -->
+    <!--NAVBAR -->
     <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-pink-100 px-8 py-3">
         <div class="max-w-[1200px] mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -24,9 +22,9 @@
             
             <nav class="flex gap-6 text-sm font-semibold text-gray-600">
                 <a href="#" class="hover:text-[#AB2C5D]">Dashboard</a>
-                <a href="#" class="hover:text-[#AB2C5D]">Katalog Produk</a>
-                <a href="#" class="hover:text-[#AB2C5D]">Jurnal Kulit</a>
-                <a href="#" class="hover:text-[#AB2C5D]">Riwayat Jurnal</a>
+                <a href="{{ route('katalog') }}" class="hover:text-[#AB2C5D]">Katalog Produk</a>
+                <a href="{{ route('jurnal.pagi') }}" class="hover:text-[#AB2C5D]">Jurnal Kulit</a>
+                <a href="{{ route('jurnal.riwayat') }}" class="hover:text-[#AB2C5D]">Riwayat Jurnal</a>
                 <a href="#" class="text-white bg-[#AB2C5D] px-3 py-1 rounded-full flex items-center font-bold">Analisis Kecocokan</a>
             </nav>
             
@@ -63,10 +61,8 @@
             </div>
         </div>
 
-        <!-- GRID UTAMA (2 KOLOM: KIRI DAN KANAN) -->
+        <!-- GRID UTAMA-->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-            <!-- ================= KOLOM KIRI (7/12) ================= -->
             <div class="lg:col-span-7 space-y-6">
 
                 <!-- CARD 1: SUSPECT PRODUCT HIGHLIGHT -->
