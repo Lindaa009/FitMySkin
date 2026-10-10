@@ -1,29 +1,9 @@
-@extends('layouts.app2')
+@extends('layouts.app')
 
 @section('title', 'Dashboard - FitMySkin')
 
 @section('content')
 <div class="max-w-6xl mx-auto w-full px-4 sm:px-6 py-6">
-
-    <!-- NAVBAR -->
-    <header class="bg-white rounded-2xl shadow-xs px-4 sm:px-6 py-3.5 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-            <div class="bg-rose-500 text-white p-2 rounded-xl flex items-center justify-center shadow-xs">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-            </div>
-            <div>
-                <span class="font-bold text-rose-500 text-lg leading-tight block">FitMySkin</span>
-                <span class="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold block">Skin Journal</span>
-            </div>
-        </div>
-
-        <nav class="flex items-center gap-1 sm:gap-2 bg-rose-50/50 p-1 rounded-xl text-xs sm:text-sm font-medium">
-            <a href="{{ route('dashboard') }}" class="bg-rose-500 text-white px-3.5 py-1.5 rounded-lg shadow-xs transition">Dashboard</a>
-            <a href="{{ route('katalog') }}" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Katalog Produk</a>
-            <a href="{{ route('jurnal.pagi') }}" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Jurnal Kulit</a>
-            <a href="{{ route('jurnal.riwayat') }}" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Riwayat Jurnal</a>
-            <a href="{{ route('analisis.kecocokan') }}" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Analisis Kecocokan</a>
-        </nav>
 
         <div class="flex items-center gap-3">
             <div class="flex items-center gap-1.5 bg-rose-50 border border-rose-100 px-3 py-1.5 rounded-full text-xs font-semibold text-rose-600">
