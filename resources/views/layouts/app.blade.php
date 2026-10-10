@@ -28,6 +28,29 @@
             <a href="{{ route('jurnal.riwayat') }}" @if (request()->routeIs('jurnal.riwayat')) aria-current="page" @endif>Riwayat</a>
             <a href="{{ route('analisis.kecocokan') }}" @if (request()->routeIs('analisis.kecocokan')) aria-current="page" @endif>Analisis</a>
         </nav>
+
+        <!-- Widget Kanan (Streak, Notifikasi, Profil Pengguna) -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <!-- Badge Streak -->
+            <div style="display: flex; align-items: center; gap: 5px; background: var(--rose-pale); border: 1px solid #f7d5de; padding: 5px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; color: var(--rose);">
+                <span>🔥</span>
+                <span>5 Hari Streak ✨</span>
+            </div>
+
+            <!-- Tombol Notifikasi (Loneng) -->
+            <button type="button" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: white; display: grid; place-items: center; cursor: pointer; color: var(--muted); transition: background 0.2s;" title="Notifikasi">
+                🔔
+            </button>
+
+            <!-- Profil Pengguna (Clara) -->
+            <div style="display: flex; align-items: center; gap: 8px; background: white; border: 1px solid var(--line); padding: 4px 12px 4px 4px; border-radius: 999px;">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" alt="Clara" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                <div style="text-align: left; line-height: 1.2;">
+                    <span style="display: block; font-size: 11px; font-weight: 800; color: var(--ink);">Clara</span>
+                    <span style="display: block; font-size: 9px; color: var(--muted);">Normal / Kombinasi</span>
+                </div>
+            </div>
+        </div>
     </header>
 
     <main class="page-shell">
