@@ -19,10 +19,10 @@
 
         <nav class="flex items-center gap-1 sm:gap-2 bg-rose-50/50 p-1 rounded-xl text-xs sm:text-sm font-medium">
             <a href="{{ route('dashboard') }}" class="bg-rose-500 text-white px-3.5 py-1.5 rounded-lg shadow-xs transition">Dashboard</a>
-            <a href="#" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Katalog Produk</a>
-            <a href="#" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Jurnal Kulit</a>
-            <a href="#" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Riwayat Jurnal</a>
-            <a href="#" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Analisis Kecocokan</a>
+            <a href="{{ route('katalog') }}" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Katalog Produk</a>
+            <a href="{{ route('jurnal.pagi') }}" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Jurnal Kulit</a>
+            <a href="{{ route('jurnal.riwayat') }}" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Riwayat Jurnal</a>
+            <a href="{{ route('analisis.kecocokan') }}" class="text-neutral-600 hover:text-rose-500 px-3.5 py-1.5 rounded-lg transition">Analisis Kecocokan</a>
         </nav>
 
         <div class="flex items-center gap-3">
