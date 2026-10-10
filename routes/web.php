@@ -6,9 +6,10 @@ Route::get('/', function () {
     return view('auth.login-register');
 })->name('login');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
 Route::get('/notifikasi', function () {
     return view('notifikasi');
