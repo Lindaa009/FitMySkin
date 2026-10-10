@@ -18,6 +18,10 @@ Route::get('/profil', function () {
     return view('profil');
 })->name('profil');
 
+Route::get('/profil/kelola-langkah', function () {
+    return view('kelola-langkah');
+})->name('profil.langkah');
+
 Route::view('/katalog', 'katalog.index')->name('katalog');
 Route::view('/jurnal/pagi', 'jurnal.pagi')->name('jurnal.pagi');
 Route::view('/jurnal/malam', 'jurnal.malam')->name('jurnal.malam');
