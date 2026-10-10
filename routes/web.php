@@ -10,6 +10,14 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
+Route::get('/notifikasi', function () {
+    return view('notifikasi');
+})->name('notifikasi');
+
+Route::get('/profil', function () {
+    return view('profil');
+})->name('profil');
+
 Route::view('/katalog', 'katalog.index')->name('katalog');
 Route::view('/jurnal/pagi', 'jurnal.pagi')->name('jurnal.pagi');
 Route::view('/jurnal/malam', 'jurnal.malam')->name('jurnal.malam');
