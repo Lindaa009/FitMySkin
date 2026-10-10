@@ -49,6 +49,10 @@
                     <span style="display: block; font-size: 9px; color: var(--muted);">Normal / Kombinasi</span>
                 </div>
             </a>
+
+            <a href="{{ route('login') }}" style="display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 999px; border: 1px solid #f7d5de; background: #fff0f2; color: var(--rose); font-size: 11px; font-weight: 800; text-decoration: none; transition: background 0.2s;" title="Keluar Akun">
+                🚪 Keluar
+            </a>
         </div>
     </header>
 
