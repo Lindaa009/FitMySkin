@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Masuk atau Daftar')
 @section('page', 'auth')
 
