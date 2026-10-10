@@ -38,18 +38,18 @@
             </div>
 
             <!-- Tombol Notifikasi (Loneng) -->
-            <button type="button" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: white; display: grid; place-items: center; cursor: pointer; color: var(--muted); transition: background 0.2s;" title="Notifikasi">
+            <a href="{{ route('notifikasi') }}" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: white; display: grid; place-items: center; text-decoration: none; color: var(--muted); transition: background 0.2s;" title="Notifikasi">
                 🔔
-            </button>
+            </a>
 
             <!-- Profil Pengguna (Clara) -->
-            <div style="display: flex; align-items: center; gap: 8px; background: white; border: 1px solid var(--line); padding: 4px 12px 4px 4px; border-radius: 999px;">
+            <a href="{{ route('profil') }}" style="display: flex; align-items: center; gap: 8px; background: white; border: 1px solid var(--line); padding: 4px 12px 4px 4px; border-radius: 999px; text-decoration: none; color: inherit;">
                 <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" alt="Clara" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
                 <div style="text-align: left; line-height: 1.2;">
                     <span style="display: block; font-size: 11px; font-weight: 800; color: var(--ink);">Clara</span>
                     <span style="display: block; font-size: 9px; color: var(--muted);">Normal / Kombinasi</span>
                 </div>
-            </div>
+            </a>
         </div>
     </header>
 
