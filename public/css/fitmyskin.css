@@ -146,7 +146,7 @@ button { color: inherit; }
 .step-number { display: grid; flex: 0 0 auto; width: 37px; height: 37px; place-items: center; border: 1px solid #f4dbe2; border-radius: 13px; color: var(--rose); background: var(--rose-pale); font-size: 10px; font-weight: 800; }
 .journal-card-heading h2 { margin: 3px 0 0; font-size: 15px; font-weight: 800; letter-spacing: -.3px; }
 .form-hint { margin: 13px 0 15px; color: var(--muted); font-size: 11px; }
-.journal-products { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.journal-products { display: grid; grid-template-columns: 1fr; gap: 9px; }
 .journal-product-option { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 14px; cursor: pointer; transition: border-color .18s ease, background .18s ease; }
 .journal-product-option:has(input:checked) { border-color: #dc8ba4; background: #fff7f8; }
 .journal-product-option input, .check-option input { width: 15px; height: 15px; flex: 0 0 auto; margin: 2px 0 0; accent-color: var(--rose); }

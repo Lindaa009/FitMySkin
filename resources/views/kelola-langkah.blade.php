@@ -56,7 +56,8 @@
         <div>
             <div style="display: flex; items-center; justify-content: space-between; margin-bottom: 14px;">
                 <h2 style="margin: 0; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
-                    ⇅ Urutan Pemakaian <span style="font-weight: 500; color: var(--muted); font-size: 10px;">(Tekan panah atau ubah jenis langsung)</span>
+                    ⇅ Urutan Pemakaian 
+                    <span style="font-weight: 500; color: var(--muted); font-size: 10px;">(Geser card atau pakai panah ▲▼)</span>
                 </h2>
             </div>
 
@@ -80,21 +81,39 @@
                 <div style="display: flex; gap: 8px;">
                     <select id="add-step-select" style="min-height: 36px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line); font-size: 10px; background: white; outline: none; cursor: pointer;">
                         <option value="">Pilih Jenis Produk</option>
-                        <option value="Micellar Water">Micellar Water</option>
-                        <option value="Facial Wash">Facial Wash</option>
-                        <option value="Cleansing Oil">Cleansing Oil</option>
-                        <option value="Toner">Toner</option>
-                        <option value="Exfoliating Toner">Exfoliating Toner</option>
-                        <option value="Essence">Essence</option>
-                        <option value="Serum">Serum</option>
-                        <option value="Ampoule">Ampoule</option>
-                        <option value="Eye Cream">Eye Cream</option>
-                        <option value="Moisturizer">Moisturizer</option>
-                        <option value="Facial Oil">Facial Oil</option>
-                        <option value="Sunscreen">Sunscreen</option>
-                        <option value="Sleeping Mask">Sleeping Mask</option>
-                        <option value="Sheet Mask">Sheet Mask</option>
-                        <option value="Spot Treatment">Spot Treatment</option>
+
+                        <optgroup label="🧼 Pembersih (Cleansing)">
+                            <option value="Micellar Water">Micellar Water</option>
+                            <option value="Cleansing Oil">Cleansing Oil</option>
+                            <option value="Facial Wash">Facial Wash</option>
+                        </optgroup>
+
+                        <optgroup label="💧 Penyeimbang (Prep)">
+                            <option value="Toner">Toner</option>
+                            <option value="Exfoliating Toner">Exfoliating Toner</option>
+                            <option value="Essence">Essence</option>
+                        </optgroup>
+
+                        <optgroup label="✨ Perawatan Khusus (Treatment)">
+                            <option value="Serum">Serum</option>
+                            <option value="Ampoule">Ampoule</option>
+                            <option value="Eye Cream">Eye Cream</option>
+                            <option value="Spot Treatment">Spot Treatment</option>
+                        </optgroup>
+
+                        <optgroup label="☁ Pelembap (Moisture Lock)">
+                            <option value="Moisturizer">Moisturizer</option>
+                            <option value="Facial Oil">Facial Oil</option>
+                        </optgroup>
+
+                        <optgroup label="🌙 Perawatan Ekstra (Malam)">
+                            <option value="Sleeping Mask">Sleeping Mask</option>
+                            <option value="Sheet Mask">Sheet Mask</option>
+                        </optgroup>
+
+                        <optgroup label="☀ Pelindung (Day)">
+                            <option value="Sunscreen">Sunscreen</option>
+                        </optgroup>
                     </select>
                     <button type="button" class="button button-primary" style="background: #ef6b94; font-size: 10px; height: 36px; padding: 0 16px; border-radius: 12px;">
                         + Sisipkan
@@ -184,6 +203,42 @@
 
 @push('scripts')
 <script>
+        function showConfirm(message, onConfirm, options = {}) {
+        const modal = document.getElementById('confirm-modal');
+        if (!modal) {
+            if (window.confirm(message)) onConfirm();
+            return;
+        }
+
+        const title = options.title || 'Konfirmasi';
+        const icon = options.icon || '⚠️';
+        const okText = options.okText || 'Ya, Lanjutkan';
+
+        document.getElementById('confirm-title').textContent = title;
+        document.getElementById('confirm-message').textContent = message;
+        document.getElementById('confirm-icon').textContent = icon;
+
+        const okBtn = document.getElementById('confirm-ok');
+        const cancelBtn = document.getElementById('confirm-cancel');
+        okBtn.textContent = okText;
+
+        modal.style.display = 'flex';
+
+        const newOk = okBtn.cloneNode(true);
+        const newCancel = cancelBtn.cloneNode(true);
+        okBtn.replaceWith(newOk);
+        cancelBtn.replaceWith(newCancel);
+
+        const close = () => { modal.style.display = 'none'; };
+
+        newOk.addEventListener('click', () => { close(); onConfirm(); });
+        newCancel.addEventListener('click', close);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) close();
+        });
+    }
+
     // Data dari server
     let routineData = @json($initialRoutine);
     let currentType = 'pagi';
@@ -221,9 +276,12 @@
         }
 
         container.innerHTML = items.map((item, index) => `
-            <div class="journal-card" style="padding: 16px 20px; border-radius: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <div class="journal-card routine-item" 
+                draggable="true" 
+                data-index="${index}"
+                style="padding: 16px 20px; border-radius: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: grab; transition: opacity 0.2s, transform 0.2s;">
                 <div style="display: flex; align-items: center; gap: 14px;">
-                    <span style="color: #c4b5b9; font-size: 12px;">:::</span>
+                    <span style="color: #c4b5b9; font-size: 14px; cursor: grab;" title="Geser untuk ubah urutan">⋮⋮</span>
                     <span style="background: #fdf2f4; color: #ab2c5d; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 800;">
                         ${String(index + 1).padStart(2, '0')}
                     </span>
@@ -240,7 +298,22 @@
                 </div>
             </div>
         `).join('');
-
+         
+                // Update dropdown: disable opsi yang udah ada di list
+        const selectEl = document.getElementById('add-step-select');
+        if (selectEl) {
+            const existing = new Set((routineData[type] || []).map(i => i.title));
+            Array.from(selectEl.options).forEach(opt => {
+                if (!opt.value) return;
+                const isExist = existing.has(opt.value);
+                opt.disabled = isExist;
+                opt.textContent = isExist ? opt.value + ' (sudah ada)' : opt.value;
+            });
+            if (selectEl.value && existing.has(selectEl.value)) {
+                selectEl.value = '';
+            }
+        }
+        
         // Pasang event listener untuk tombol
         container.querySelectorAll('button[data-action]').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -254,6 +327,56 @@
                 } else if (action === 'delete') {
                     routineData[type].splice(idx, 1);
                 }
+                renderRoutine(type);
+            });
+        });
+
+        // Drag & Drop handler
+        let dragSrcIndex = null;
+
+        container.querySelectorAll('.routine-item').forEach(el => {
+            el.addEventListener('dragstart', (e) => {
+                dragSrcIndex = parseInt(el.dataset.index);
+                el.style.opacity = '0.4';
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', dragSrcIndex);
+            });
+
+            el.addEventListener('dragend', () => {
+                el.style.opacity = '1';
+                container.querySelectorAll('.routine-item').forEach(x => {
+                    x.style.borderTop = '';
+                    x.style.borderBottom = '';
+                });
+            });
+
+            el.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                const targetIndex = parseInt(el.dataset.index);
+                if (targetIndex === dragSrcIndex) return;
+
+                // Visual: kasih garis atas kalau mau taruh sebelum
+                container.querySelectorAll('.routine-item').forEach(x => {
+                    x.style.borderTop = '';
+                    x.style.borderBottom = '';
+                });
+                el.style.borderTop = '3px solid var(--rose)';
+            });
+
+            el.addEventListener('dragleave', () => {
+                el.style.borderTop = '';
+            });
+
+            el.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const targetIndex = parseInt(el.dataset.index);
+                if (targetIndex === dragSrcIndex || dragSrcIndex === null) return;
+
+                // Geser item
+                const moved = routineData[type].splice(dragSrcIndex, 1)[0];
+                routineData[type].splice(targetIndex, 0, moved);
+                dragSrcIndex = null;
                 renderRoutine(type);
             });
         });
@@ -288,7 +411,6 @@
         const select = document.getElementById('add-step-select');
         if (!select) return;
 
-        // Cari tombol "Sisipkan"
         let sisipkanBtn = null;
         document.querySelectorAll('button').forEach(b => {
             if (b.textContent.includes('Sisipkan')) sisipkanBtn = b;
@@ -301,6 +423,14 @@
                 showToast('Pilih jenis produk dulu.');
                 return;
             }
+
+            // Guard: cek duplikat
+            const existing = new Set((routineData[currentType] || []).map(i => i.title));
+            if (existing.has(val)) {
+                showToast('⚠️ "' + val + '" sudah ada di urutan. Pilih yang lain.');
+                return;
+            }
+
             routineData[currentType].push({
                 title: val,
                 desc: `Langkah ${routineData[currentType].length + 1}: ${val}`
@@ -356,23 +486,35 @@
         if (!btn) return;
 
         btn.addEventListener('click', () => {
-            if (!confirm('Reset urutan ke pengaturan default? Perubahan yang belum disimpan akan hilang.')) return;
-            
-            routineData.pagi = [
-                { title: 'Facial Wash', desc: 'Langkah 1: Pembersih' },
-                { title: 'Toner', desc: 'Langkah 2: Penyeimbang' },
-                { title: 'Serum', desc: 'Langkah 3: Perawatan Khusus' },
-                { title: 'Moisturizer', desc: 'Langkah 4: Pengunci' },
-                { title: 'Sunscreen', desc: 'Langkah 5: Perlindungan Terluar' },
-            ];
-            routineData.malam = [
-                { title: 'Facial Wash', desc: 'Langkah 1: Pembersih' },
-                { title: 'Toner', desc: 'Langkah 2: Penyeimbang' },
-                { title: 'Serum', desc: 'Langkah 3: Perawatan Khusus' },
-                { title: 'Moisturizer', desc: 'Langkah 4: Pengunci' },
-            ];
-            renderRoutine(currentType);
-            showToast('🔄 Urutan direset ke default. Jangan lupa klik Simpan.');
+            const doReset = () => {
+                routineData.pagi = [
+                    { title: 'Facial Wash', desc: 'Langkah 1: Pembersih' },
+                    { title: 'Toner', desc: 'Langkah 2: Penyeimbang' },
+                    { title: 'Serum', desc: 'Langkah 3: Perawatan Khusus' },
+                    { title: 'Moisturizer', desc: 'Langkah 4: Pengunci' },
+                    { title: 'Sunscreen', desc: 'Langkah 5: Perlindungan Terluar' },
+                ];
+                routineData.malam = [
+                    { title: 'Facial Wash', desc: 'Langkah 1: Pembersih' },
+                    { title: 'Toner', desc: 'Langkah 2: Penyeimbang' },
+                    { title: 'Serum', desc: 'Langkah 3: Perawatan Khusus' },
+                    { title: 'Moisturizer', desc: 'Langkah 4: Pengunci' },
+                ];
+                renderRoutine(currentType);
+                showToast('🔄 Urutan direset ke default. Jangan lupa klik Simpan.');
+            };
+
+            if (typeof window.showConfirm === 'function') {
+                window.showConfirm(
+                    'Reset urutan ke pengaturan default? Perubahan yang belum disimpan akan hilang.',
+                    doReset,
+                    { title: 'Reset ke Default?', icon: '🔄', okText: 'Ya, Reset' }
+                );
+            } else {
+                if (window.confirm('Reset urutan ke pengaturan default? Perubahan yang belum disimpan akan hilang.')) {
+                    doReset();
+                }
+            }
         });
     }
 

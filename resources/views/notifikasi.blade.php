@@ -55,8 +55,9 @@
                                 </a>
                             @else
                                 <button type="button"
-                                        class="button {{ $notif['aksi_style'] === 'primary' ? 'button-primary' : 'button-secondary' }}"
-                                        style="font-size: 10px; height: 32px; padding: 0 16px; border-radius: 99px; {{ $notif['aksi_style'] === 'primary' ? 'background: #ab2c5d;' : 'background: white; color: #ab2c5d; border-color: #f7d5de;' }}">
+                                        data-share="{{ $notif['judul'] }}"
+                                        class="button {{ $notif['aksi_style'] === 'primary' ? 'button-primary' : 'button-secondary' }} btn-share"
+                                        style="...">
                                     {{ $notif['aksi_text'] }}
                                 </button>
                             @endif
@@ -89,4 +90,45 @@
     </div>
 
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.btn-share').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const text = btn.dataset.share || 'Aku lagi konsisten merawat kulit pakai FitMySkin! 🌸';
+                
+                // Coba pakai Web Share API (kalau didukung)
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'FitMySkin — Pencapaian Streak',
+                            text: text,
+                            url: window.location.origin,
+                        });
+                        return;
+                    } catch (err) {
+                        // User cancel atau error, fallback ke copy
+                    }
+                }
+
+                // Fallback: copy ke clipboard
+                try {
+                    await navigator.clipboard.writeText(text + ' ' + window.location.origin);
+                    const toast = document.querySelector('#app-toast');
+                    if (toast) {
+                        toast.textContent = '✅ Pencapaian dicopy ke clipboard!';
+                        toast.classList.add('is-visible');
+                        setTimeout(() => toast.classList.remove('is-visible'), 3000);
+                    } else {
+                        alert('✅ Pencapaian dicopy!');
+                    }
+                } catch (e) {
+                    alert('Pencapaianmu: ' + text);
+                }
+            });
+        });
+    });
+</script>
+@endpush
 @endsection

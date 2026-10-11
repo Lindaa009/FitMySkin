@@ -21,7 +21,8 @@
         </a>
 
         <button class="nav-toggle" type="button" aria-label="Buka navigasi" aria-expanded="false" aria-controls="main-navigation">
-            <span></span><span></span><span></span>
+            <span class="nav-toggle-icon">☰</span>
+            <span>Menu</span>
         </button>
 
         <nav class="main-navigation" id="main-navigation" aria-label="Navigasi utama">
@@ -46,9 +47,13 @@
 
             <!-- Profil Pengguna -->
             <a href="{{ route('profil') }}" style="display: flex; align-items: center; gap: 8px; background: white; border: 1px solid var(--line); padding: 4px 14px 4px 4px; border-radius: 999px; text-decoration: none; color: inherit; white-space: nowrap;">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--rose); color: white; display: grid; place-items: center; font-weight: 800; font-size: 13px;">
-                    {{ strtoupper(substr(auth()->user()->nama_user ?? 'U', 0, 1)) }}
-                </div>
+                @if (auth()->user()->foto_profil)
+                    <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" alt="{{ auth()->user()->nama_user }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                @else
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--rose); color: white; display: grid; place-items: center; font-weight: 800; font-size: 13px;">
+                        {{ strtoupper(substr(auth()->user()->nama_user ?? 'U', 0, 1)) }}
+                    </div>
+                @endif
                 <div style="text-align: left; line-height: 1.2;">
                     <span style="display: block; font-size: 11px; font-weight: 800; color: var(--ink);">{{ auth()->user()->nama_user ?? 'User' }}</span>
                     <span style="display: block; font-size: 9px; color: var(--muted);">FitMySkin Member</span>
@@ -74,7 +79,28 @@
     </footer>
 
     <div class="toast" id="app-toast" role="status" aria-live="polite"></div>
-   <script src="{{ asset('js/fitmyskin.js') }}" defer></script>
+    <!-- Modal Konfirmasi Global -->
+    <div id="confirm-modal" style="display: none; position: fixed; inset: 0; z-index: 999; background: rgba(51, 38, 43, 0.5); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: white; border-radius: 28px; padding: 32px 28px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 25px 60px rgba(103, 53, 69, 0.25); border: 1px solid var(--line); animation: confirmPop 0.2s ease;">
+            <div id="confirm-icon" style="width: 68px; height: 68px; background: linear-gradient(135deg, var(--rose-pale), #f7dfd5); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 18px; font-size: 28px;">
+                ⚠️
+            </div>
+            <h3 id="confirm-title" style="margin: 0 0 8px; font-size: 18px; font-weight: 800; color: var(--ink);">Konfirmasi</h3>
+            <p id="confirm-message" style="margin: 0 0 22px; color: var(--muted); font-size: 12px; line-height: 1.6;">Apakah kamu yakin?</p>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" id="confirm-cancel" class="button button-secondary" style="flex: 1; border-radius: 99px; justify-content: center; padding: 12px 0; font-size: 12px; border: 1px solid var(--line);">Batal</button>
+                <button type="button" id="confirm-ok" class="button button-primary" style="flex: 1; border-radius: 99px; justify-content: center; padding: 12px 0; font-size: 12px; background: var(--rose); color: white;">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    @keyframes confirmPop {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    </style>
+    <script src="{{ asset('js/fitmyskin.js') }}" defer></script>
     @stack('scripts')
 </body>
 </html>

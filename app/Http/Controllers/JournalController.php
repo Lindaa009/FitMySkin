@@ -6,29 +6,65 @@ use App\Models\Journal;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class JournalController extends Controller
 {
+    // Function hitungStreak
+    private function hitungStreak($userId): int
+    {
+        $tanggalList = Journal::where('id_user', $userId)
+            ->selectRaw('DATE(tanggal_pemakaian) as tgl')
+            ->distinct()
+            ->orderBy('tgl', 'desc')
+            ->pluck('tgl')
+            ->map(fn ($t) => Carbon::parse($t)->startOfDay())
+            ->toArray();
+
+        if (empty($tanggalList)) return 0;
+
+        $today = Carbon::today();
+        if ($today->diffInDays($tanggalList[0], false) > 1) return 0;
+
+        $streak = 1;
+        for ($i = 1; $i < count($tanggalList); $i++) {
+            if ($tanggalList[$i - 1]->diffInDays($tanggalList[$i], false) !== 1) break;
+            $streak++;
+        }
+        return $streak;
+    }
     // Halaman form jurnal pagi
     public function morning()
     {
-        $products = Product::where('id_user', Auth::id())
+        $userId = Auth::id();
+
+        $products = Product::where('id_user', $userId)
             ->where('status_pemakaian', 'Aktif')
             ->get();
 
-        return view('jurnal.pagi', ['initialProducts' => $this->mapProducts($products)]);
+        return view('jurnal.pagi', [
+            'initialProducts' => $this->mapProducts($products),
+            'streak' => $this->hitungStreak($userId),
+            'routineCategories' => $this->getRoutineCategories($userId, 'pagi'),
+        ]);
     }
 
     // Halaman form jurnal malam
     public function evening()
     {
-        $products = Product::where('id_user', Auth::id())
+        $userId = Auth::id();
+
+        $products = Product::where('id_user', $userId)
             ->where('status_pemakaian', 'Aktif')
             ->get();
 
-        return view('jurnal.malam', ['initialProducts' => $this->mapProducts($products)]);
+        return view('jurnal.malam', [
+            'initialProducts' => $this->mapProducts($products),
+            'streak' => $this->hitungStreak($userId),
+            'routineCategories' => $this->getRoutineCategories($userId, 'malam'),
+        ]);
     }
-
+    
     // Halaman riwayat
     public function history()
     {
@@ -134,5 +170,63 @@ class JournalController extends Controller
         if (str_contains($j, 'siang')) return 'morning';
         if (str_contains($j, 'malam')) return 'evening';
         return 'both';
+    }
+
+        private function getRoutineCategories($userId, $type)
+    {
+        $routine = \App\Models\Routine::where('id_user', $userId)
+            ->orderBy('tanggal_diubah', 'desc')
+            ->first();
+
+        if (!$routine || empty($routine->detail_urutan)) {
+            return $this->defaultRoutineCategories($type);
+        }
+
+        $decoded = json_decode($routine->detail_urutan, true);
+        $steps = $decoded[$type] ?? [];
+
+        if (empty($steps)) {
+            return $this->defaultRoutineCategories($type);
+        }
+
+        $categories = [];
+        foreach ($steps as $step) {
+            $cat = $this->mapStepToCategory($step['title'] ?? '');
+            if ($cat && !in_array($cat, $categories)) {
+                $categories[] = $cat;
+            }
+        }
+
+        return $categories;
+    }
+
+    private function defaultRoutineCategories($type)
+    {
+        if ($type === 'pagi') {
+            return ['cleanser', 'toner', 'serum', 'moisturizer', 'sunscreen'];
+        }
+        return ['cleanser', 'toner', 'serum', 'moisturizer'];
+    }
+
+    private function mapStepToCategory($title)
+    {
+        $map = [
+            'Micellar Water' => 'cleanser',
+            'Cleansing Oil' => 'cleanser',
+            'Facial Wash' => 'cleanser',
+            'Toner' => 'toner',
+            'Exfoliating Toner' => 'toner',
+            'Essence' => 'toner',
+            'Serum' => 'serum',
+            'Ampoule' => 'serum',
+            'Eye Cream' => 'serum',
+            'Spot Treatment' => 'serum',
+            'Moisturizer' => 'moisturizer',
+            'Facial Oil' => 'moisturizer',
+            'Sleeping Mask' => 'exfoliator',
+            'Sheet Mask' => 'exfoliator',
+            'Sunscreen' => 'sunscreen',
+        ];
+        return $map[$title] ?? null;
     }
 }

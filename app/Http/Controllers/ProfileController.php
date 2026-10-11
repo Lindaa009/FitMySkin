@@ -8,6 +8,7 @@ use App\Models\Routine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use App\Models\User;
 
@@ -56,6 +57,7 @@ class ProfileController extends Controller
             'streak' => $streak,
             'pagi' => $pagi,
             'malam' => $malam,
+            'user' => Auth::user(),
         ]);
     }
 
@@ -67,12 +69,24 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'nama_user' => 'required|string|max:100',
             'alamat_email' => 'required|email|max:100|unique:users,alamat_email,' . $user->id_user . ',id_user',
+            'no_wa' => 'nullable|string|max:20',
+            'tanggal_lahir' => 'nullable|date',
+            'tipe_kulit' => 'nullable|in:Normal,Berminyak,Kering,Kombinasi',
+            'concerns' => 'nullable|array',
+            'concerns.*' => 'string|max:100',
+            'alergi' => 'nullable|array',
+            'alergi.*' => 'string|max:100',
         ], [
             'alamat_email.unique' => 'Email ini sudah dipakai user lain.',
         ]);
 
         $user->nama_user = $validated['nama_user'];
         $user->alamat_email = $validated['alamat_email'];
+        $user->no_wa = $validated['no_wa'] ?? null;
+        $user->tanggal_lahir = $validated['tanggal_lahir'] ?? null;
+        $user->tipe_kulit = $validated['tipe_kulit'] ?? null;
+        $user->concerns = isset($validated['concerns']) ? json_encode($validated['concerns']) : null;
+        $user->alergi = isset($validated['alergi']) ? json_encode($validated['alergi']) : null;
         $user->save();
 
         return response()->json([
@@ -105,6 +119,35 @@ class ProfileController extends Controller
         $user->save();
 
         return response()->json(['success' => true]);
+    }
+
+    public function uploadFoto(Request $request)
+    {
+        $request->validate([
+            'foto_profil' => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
+        ], [
+            'foto_profil.image' => 'File harus berupa gambar.',
+            'foto_profil.mimes' => 'Format harus JPG, PNG, atau WEBP.',
+            'foto_profil.max' => 'Ukuran maksimal 2MB.',
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Hapus foto lama kalau ada
+        if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
+            Storage::disk('public')->delete($user->foto_profil);
+        }
+
+        $path = $request->file('foto_profil')->store('avatars', 'public');
+
+        $user->foto_profil = $path;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'foto_url' => asset('storage/' . $path),
+        ]);
     }
 
     private function hitungStreak($userId): int

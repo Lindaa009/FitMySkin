@@ -13,7 +13,17 @@ class User extends Authenticatable
     protected $primaryKey = 'id_user';
     public $timestamps = false;
 
-    protected $fillable = ['nama_user', 'alamat_email', 'password'];
+    protected $fillable = [
+        'nama_user',
+        'alamat_email',
+        'password',
+        'foto_profil',
+        'tipe_kulit',
+        'concerns',
+        'alergi',
+        'tanggal_lahir',
+        'no_wa',
+    ];
     protected $hidden = ['password'];
 
     public function products()

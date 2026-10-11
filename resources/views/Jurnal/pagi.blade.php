@@ -93,5 +93,7 @@
 
     <script>
         window.__INITIAL_PRODUCTS__ = {!! json_encode($initialProducts) !!};
+        window.__STREAK__ = {{ $streak }};
+        window.__ROUTINE_CATEGORIES__ = {!! json_encode($routineCategories) !!};
     </script>
 @endsection

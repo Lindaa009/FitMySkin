@@ -37,6 +37,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profil', [ProfileController::class, 'index'])->name('profil');
     Route::put('/profil', [ProfileController::class, 'update'])->name('profil.update');
     Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profil.password');
+    Route::post('/profil/foto', [ProfileController::class, 'uploadFoto'])->name('profil.foto');
     Route::get('/profil/kelola-langkah', [RoutineController::class, 'index'])->name('profil.langkah');
     Route::post('/routines', [RoutineController::class, 'save'])->name('routines.save');
     Route::get('/analisis/kecocokan', [AnalisisController::class, 'index'])->name('analisis.kecocokan');

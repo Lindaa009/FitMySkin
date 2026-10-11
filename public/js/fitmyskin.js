@@ -46,6 +46,78 @@
         return response.json();
     }
 
+        function showConfirm(message, onConfirm, options = {}) {
+        const modal = document.getElementById('confirm-modal');
+        if (!modal) {
+            // Fallback ke confirm bawaan kalau modal nggak ada
+            if (window.confirm(message)) onConfirm();
+            return;
+        }
+
+        window.showConfirm = showConfirm;
+
+        const title = options.title || 'Konfirmasi';
+        const icon = options.icon || '⚠️';
+        const okText = options.okText || 'Ya, Lanjutkan';
+        const danger = options.danger !== false; // default merah
+
+        document.getElementById('confirm-title').textContent = title;
+        document.getElementById('confirm-message').textContent = message;
+        document.getElementById('confirm-icon').textContent = icon;
+
+        const okBtn = document.getElementById('confirm-ok');
+        const cancelBtn = document.getElementById('confirm-cancel');
+
+        okBtn.textContent = okText;
+        okBtn.style.background = danger ? 'var(--rose)' : 'var(--green)';
+
+        modal.style.display = 'flex';
+
+        // Clone button biar event listener lama kehapus
+        const newOk = okBtn.cloneNode(true);
+        const newCancel = cancelBtn.cloneNode(true);
+        okBtn.replaceWith(newOk);
+        cancelBtn.replaceWith(newCancel);
+
+        const close = () => { modal.style.display = 'none'; };
+
+        newOk.addEventListener('click', () => {
+            close();
+            onConfirm();
+        });
+        newCancel.addEventListener('click', close);
+
+        // Close kalau klik backdrop
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) close();
+        });
+
+        // Close kalau tekan ESC
+        const escHandler = (e) => {
+            if (e.key === 'Escape') {
+                close();
+                document.removeEventListener('keydown', escHandler);
+            }
+        };
+        document.addEventListener('keydown', escHandler);
+    }
+
+        function setLoading(button, isLoading, loadingText = 'Memproses...') {
+        if (!button) return;
+        if (isLoading) {
+            button.dataset.originalText = button.textContent;
+            button.disabled = true;
+            button.style.opacity = '0.6';
+            button.style.cursor = 'not-allowed';
+            button.textContent = loadingText;
+        } else {
+            button.disabled = false;
+            button.style.opacity = '1';
+            button.style.cursor = '';
+            button.textContent = button.dataset.originalText || button.textContent;
+        }
+    }
+
     function notify(message) {
         if (!toast) return;
         toast.textContent = message;
@@ -202,6 +274,7 @@
             toggle.setAttribute('aria-label', `${product.status === 'active' ? 'Istirahatkan' : 'Gunakan kembali'} ${product.name}`);
             toggle.addEventListener('click', async () => {
                 const newStatus = product.status === 'active' ? 'paused' : 'active';
+                setLoading(toggle, true, '...');
                 try {
                     await apiCall(`/products/${product.id}`, 'PUT', { status: newStatus });
                     products = products.map((item) => item.id === product.id
@@ -212,23 +285,34 @@
                 } catch (error) {
                     notify('Gagal update status produk. Coba lagi.');
                     console.error(error);
+                    setLoading(toggle, false);
                 }
             });
             const remove = createElement('button', 'product-delete', 'Hapus');
             remove.type = 'button';
             remove.setAttribute('aria-label', `Hapus ${product.name}`);
-            remove.addEventListener('click', async () => {
-                if (!window.confirm(`Hapus ${product.name} dari katalog?`)) return;
-                try {
-                    await apiCall(`/products/${product.id}`, 'DELETE');
-                    products = products.filter((item) => item.id !== product.id);
-                    renderCatalog();
-                    notify('Produk dihapus dari katalog.');
-                } catch (error) {
-                    notify('Gagal hapus produk. Coba lagi.');
-                    console.error(error);
-                }
+            remove.addEventListener('click', () => {
+                showConfirm(
+                    `Produk "${product.name}" akan dihapus permanen dari katalogmu. Tindakan ini tidak dapat dibatalkan.`,
+                    async () => {
+                        try {
+                            await apiCall(`/products/${product.id}`, 'DELETE');
+                            products = products.filter((item) => item.id !== product.id);
+                            renderCatalog();
+                            notify('Produk berhasil dihapus dari katalog.');
+                        } catch (error) {
+                            notify('Gagal hapus produk. Coba lagi.');
+                            console.error(error);
+                        }
+                    },
+                    {
+                        title: 'Hapus Produk?',
+                        icon: '🗑️',
+                        okText: 'Ya, Hapus',
+                    }
+                );
             });
+
             actionButtons.append(toggle, remove);
             actions.append(actionButtons);
             info.append(actions);
@@ -282,6 +366,9 @@
                 return;
             }
 
+            const submitBtn = form.querySelector('button[type="submit"]');
+            setLoading(submitBtn, true, 'Menyimpan...');
+
             try {
                 const result = await apiCall('/products', 'POST', payload);
                 products.unshift(result.product);
@@ -289,9 +376,11 @@
                 notify('Produk berhasil ditambahkan ke katalog.');
                 form.reset();
                 dialog.close();
+                setLoading(submitBtn, false);
             } catch (error) {
                 notify('Gagal menambah produk. Coba lagi.');
                 console.error(error);
+                setLoading(submitBtn, false);
             }
         });
     }
@@ -300,7 +389,12 @@
         const container = document.querySelector('#journal-products');
         if (!container) return;
         container.replaceChildren();
-        const availableProducts = products.filter((product) => product.status === 'active' && productMatchesRoutine(product, type));
+
+        // Filter produk aktif yang cocok routine
+        const availableProducts = products.filter((product) =>
+            product.status === 'active' && productMatchesRoutine(product, type)
+        );
+
         if (availableProducts.length === 0) {
             container.append(createEmptyState(
                 'Belum ada produk untuk rutinitas ini',
@@ -311,18 +405,67 @@
             return;
         }
 
-        availableProducts.forEach((product) => {
+        // ─── Urutin produk sesuai routine user ───
+        const routineOrder = window.__ROUTINE_CATEGORIES__ || [];
+        const ordered = [...availableProducts].sort((a, b) => {
+            const idxA = routineOrder.indexOf(a.category);
+            const idxB = routineOrder.indexOf(b.category);
+            const posA = idxA === -1 ? 999 : idxA;
+            const posB = idxB === -1 ? 999 : idxB;
+            return posA - posB;
+        });
+
+        // Header info urutan
+        if (routineOrder.length > 0) {
+            const header = document.createElement('div');
+            header.style.cssText = 'font-size: 9px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 0 4px;';
+            header.textContent = '✨ Mengikuti urutan rutinitasmu';
+            container.append(header);
+        }
+
+        // ─── Render tiap produk dengan step number ───
+        let stepCounter = 0;
+
+        ordered.forEach((product) => {
+            const idxInRoutine = routineOrder.indexOf(product.category);
+            const isOrdered = idxInRoutine !== -1;
+            if (isOrdered) stepCounter++;
+
             const label = createElement('label', 'journal-product-option');
+            label.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: white; cursor: pointer;';
+
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.name = 'products';
             checkbox.value = product.id;
+            checkbox.style.cssText = 'accent-color: var(--rose); width: 16px; height: 16px; flex-shrink: 0;';
+
+            if (isOrdered) {
+                const stepBadge = createElement('span', '', String(stepCounter).padStart(2, '0'));
+                stepBadge.style.cssText = 'background: var(--rose-pale); color: var(--rose); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 800; flex-shrink: 0;';
+                label.append(checkbox, stepBadge);
+            } else {
+                const dot = createElement('span', '', '•');
+                dot.style.cssText = 'width: 28px; text-align: center; color: var(--muted); font-size: 16px; flex-shrink: 0;';
+                label.append(checkbox, dot);
+            }
+
             const copy = createElement('span', 'journal-product-copy');
             copy.append(createElement('strong', '', product.name));
             copy.append(createElement('span', '', `${product.brand} · ${categories[product.category] ?? 'Produk'}`));
-            label.append(checkbox, copy);
+            label.append(copy);
+
             container.append(label);
         });
+
+        // Info produk yang nggak masuk urutan
+        const unorderedCount = ordered.filter(p => !routineOrder.includes(p.category)).length;
+        if (unorderedCount > 0) {
+            const info = document.createElement('div');
+            info.style.cssText = 'font-size: 9px; color: var(--muted); font-style: italic; margin-top: 8px; padding: 0 4px;';
+            info.textContent = `+${unorderedCount} produk lain yang belum ada di urutan rutinitasmu`;
+            container.append(info);
+        }
     }
 
     function countStreak(entries) {
@@ -344,6 +487,11 @@
     }
 
     function renderStreak() {
+        // Kalau server udah kasih streak, pakai itu
+        if (typeof window.__STREAK__ === 'number') {
+            setText('[data-journal-streak]', window.__STREAK__);
+            return;
+        }
         setText('[data-journal-streak]', countStreak(journals));
     }
 
@@ -383,13 +531,18 @@
                 note: String(values.get('note') ?? '').trim(),
             };
 
+            const submitBtn = form.querySelector('button[type="submit"]');
+            setLoading(submitBtn, true, 'Menyimpan...');
+
             try {
                 await apiCall('/journals', 'POST', payload);
                 notify(`Jurnal ${type === 'morning' ? 'pagi' : 'malam'} berhasil disimpan.`);
                 window.setTimeout(() => window.location.assign('/jurnal/riwayat'), 650);
+                setLoading(submitBtn, false);
             } catch (error) {
                 notify('Gagal menyimpan jurnal. Coba lagi.');
                 console.error(error);
+                setLoading(submitBtn, false);
             }
         });
     }
@@ -446,21 +599,31 @@
 
             const remove = createElement('button', 'history-delete', 'Hapus catatan');
             remove.type = 'button';
-            remove.addEventListener('click', async () => {
-                if (!window.confirm('Hapus catatan jurnal ini? Tindakan ini tidak dapat dibatalkan.')) return;
-                const idsToDelete = entry.ids || [entry.id];
-                try {
-                    for (const jid of idsToDelete) {
-                        await apiCall(`/journals/${jid}`, 'DELETE');
+            remove.addEventListener('click', () => {
+                showConfirm(
+                    'Catatan jurnal ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.',
+                    async () => {
+                        const idsToDelete = entry.ids || [entry.id];
+                        try {
+                            for (const jid of idsToDelete) {
+                                await apiCall(`/journals/${jid}`, 'DELETE');
+                            }
+                            journals = journals.filter((item) => item.id !== entry.id);
+                            notify('Catatan jurnal berhasil dihapus.');
+                            renderHistory();
+                        } catch (error) {
+                            notify('Gagal menghapus jurnal. Coba lagi.');
+                            console.error(error);
+                        }
+                    },
+                    {
+                        title: 'Hapus Catatan Jurnal?',
+                        icon: '📖',
+                        okText: 'Ya, Hapus',
                     }
-                    journals = journals.filter((item) => item.id !== entry.id);
-                    notify('Catatan jurnal dihapus.');
-                    renderHistory();
-                } catch (error) {
-                    notify('Gagal menghapus jurnal. Coba lagi.');
-                    console.error(error);
-                }
+                );
             });
+
             card.append(dateBadge, content, remove);
             list.append(card);
         });
