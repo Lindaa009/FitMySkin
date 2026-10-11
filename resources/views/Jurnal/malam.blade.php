@@ -90,4 +90,8 @@
             <a class="aside-history-link" href="{{ route('jurnal.riwayat') }}">Buka riwayat jurnal <span aria-hidden="true">↗</span></a>
         </aside>
     </section>
+
+    <script>
+        window.__INITIAL_PRODUCTS__ = {!! json_encode($initialProducts) !!};
+    </script>
 @endsection

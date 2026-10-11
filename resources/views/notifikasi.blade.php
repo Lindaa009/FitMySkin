@@ -23,71 +23,53 @@
         <!-- KOLOM KIRI: DAFTAR NOTIFIKASI -->
         <div style="display: grid; gap: 16px;">
 
-            <!-- CARD 1: WASPADA BREAKOUT -->
-            <div class="journal-card" style="padding: 20px 24px; border-radius: 22px; display: flex; align-items: flex-start; gap: 18px; position: relative;">
-                <div style="width: 44px; height: 44px; border-radius: 50%; background: #fdf2f4; border: 1px solid #f7d5de; display: grid; place-items: center; color: #ab2c5d; font-size: 18px; flex-shrink: 0; position: relative;">
-                    ⚠️
-                    <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: #ab2c5d; border-radius: 50%; border: 2px solid white;"></span>
-                </div>
-                <div style="flex-grow: 1;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="background: #fdf2f4; color: #ab2c5d; font-size: 8px; font-weight: 800; letter-spacing: 0.8px; padding: 3px 10px; border-radius: 99px; text-transform: uppercase;">WASPADA BREAKOUT</span>
-                        <span style="font-size: 10px; color: var(--muted); font-weight: 600;">10 Menit Lalu</span>
+            @forelse ($notifikasi as $notif)
+                @php
+                    $bgStyle = $notif['tipe'] === 'streak' ? 'background: #faf5f3; border-color: transparent;' : '';
+                    $dotBadge = in_array($notif['tipe'], ['warning', 'ritual']);
+                @endphp
+                <div class="journal-card" style="padding: 20px 24px; border-radius: 22px; display: flex; align-items: flex-start; gap: 18px; position: relative; {{ $bgStyle }}">
+                    <div style="width: 44px; height: 44px; border-radius: 50%; background: #fdf2f4; border: 1px solid #f7d5de; display: grid; place-items: center; color: #ab2c5d; font-size: 18px; flex-shrink: 0; position: relative;">
+                        {{ $notif['icon'] }}
+                        @if ($dotBadge)
+                            <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: #ab2c5d; border-radius: 50%; border: 2px solid white;"></span>
+                        @endif
                     </div>
-                    <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 800; color: var(--ink);">
-                        Peringatan Deteksi Bahan Aktif! 🚨
-                    </h3>
-                    <p style="margin: 0 0 14px; color: var(--muted); font-size: 11px; line-height: 1.5; max-width: 520px;">
-                        Kamu menggunakan Glycolic Acid Exfoliating Brightening 2 malam berturut-turut. Jangan lupa beri jeda hidrasi barrier malam ini ya, cantik!
-                    </p>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <a href="#" class="button button-primary" style="font-size: 10px; height: 32px; padding: 0 14px; border-radius: 99px; background: #ab2c5d;">Lihat Analisis Kecocokan</a>
-                        <button type="button" class="button button-secondary" style="font-size: 10px; height: 32px; padding: 0 14px; border-radius: 99px; background: #faf5f3; border-color: transparent; color: var(--ink);">Tandai Sudah Paham</button>
+                    <div style="flex-grow: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="background: #fdf2f4; color: #ab2c5d; font-size: 8px; font-weight: 800; letter-spacing: 0.8px; padding: 3px 10px; border-radius: 99px; text-transform: uppercase;">{{ $notif['label'] }}</span>
+                            <span style="font-size: 10px; color: var(--muted); font-weight: 600;">{{ $notif['waktu'] }}</span>
+                        </div>
+                        <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 800; color: var(--ink);">
+                            {{ $notif['judul'] }}
+                        </h3>
+                        <p style="margin: 0 0 14px; color: var(--muted); font-size: 11px; line-height: 1.5; max-width: 520px;">
+                            {{ $notif['pesan'] }}
+                        </p>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            @if ($notif['aksi_link'])
+                                <a href="{{ $notif['aksi_link'] }}"
+                                   class="button {{ $notif['aksi_style'] === 'primary' ? 'button-primary' : 'button-secondary' }}"
+                                   style="font-size: 10px; height: 32px; padding: 0 16px; border-radius: 99px; {{ $notif['aksi_style'] === 'primary' ? 'background: #ab2c5d;' : 'background: white; color: #ab2c5d; border-color: #f7d5de;' }}">
+                                    {{ $notif['aksi_text'] }}
+                                </a>
+                            @else
+                                <button type="button"
+                                        class="button {{ $notif['aksi_style'] === 'primary' ? 'button-primary' : 'button-secondary' }}"
+                                        style="font-size: 10px; height: 32px; padding: 0 16px; border-radius: 99px; {{ $notif['aksi_style'] === 'primary' ? 'background: #ab2c5d;' : 'background: white; color: #ab2c5d; border-color: #f7d5de;' }}">
+                                    {{ $notif['aksi_text'] }}
+                                </button>
+                            @endif
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- CARD 2: RITUAL MALAM -->
-            <div class="journal-card" style="padding: 20px 24px; border-radius: 22px; display: flex; align-items: flex-start; gap: 18px;">
-                <div style="width: 44px; height: 44px; border-radius: 50%; background: #fdf2f4; border: 1px solid #f7d5de; display: grid; place-items: center; color: #ab2c5d; font-size: 18px; flex-shrink: 0;">
-                    🌙
+            @empty
+                <div class="journal-card" style="padding: 40px; text-align: center; border-radius: 22px;">
+                    <div style="font-size: 32px; margin-bottom: 10px;">🔕</div>
+                    <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 800;">Belum ada notifikasi</h3>
+                    <p style="margin: 0; font-size: 11px; color: var(--muted);">Terus catat jurnal harianmu untuk mendapatkan pengingat & analisis.</p>
                 </div>
-                <div style="flex-grow: 1;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="background: #fdf2f4; color: #ab2c5d; font-size: 8px; font-weight: 800; letter-spacing: 0.8px; padding: 3px 10px; border-radius: 99px; text-transform: uppercase;">RITUAL MALAM</span>
-                        <span style="font-size: 10px; color: var(--muted); font-weight: 600;">1 Jam Lalu</span>
-                    </div>
-                    <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 800; color: var(--ink);">
-                        Waktunya Ritual Skincare Malam! 💖
-                    </h3>
-                    <p style="margin: 0 0 14px; color: var(--muted); font-size: 11px; line-height: 1.5;">
-                        Pukul 21:00 WIB. Kulitmu butuh nutrisi sebelum tidur pulas. Yuk centang produk malam ini!
-                    </p>
-                    <a href="#" class="button button-primary" style="font-size: 10px; height: 32px; padding: 0 16px; border-radius: 99px; background: #ef6b94;">Buka Jurnal Sekarang →</a>
-                </div>
-            </div>
-
-            <!-- CARD 3: STREAK BOOSTER -->
-            <div class="journal-card" style="padding: 20px 24px; border-radius: 22px; display: flex; align-items: flex-start; gap: 18px; background: #faf5f3; border-color: transparent;">
-                <div style="width: 44px; height: 44px; border-radius: 50%; background: #fdf2f4; border: 1px solid #f7d5de; display: grid; place-items: center; color: #ab2c5d; font-size: 18px; flex-shrink: 0;">
-                    🔥
-                </div>
-                <div style="flex-grow: 1;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="background: #fdf2f4; color: #ab2c5d; font-size: 8px; font-weight: 800; letter-spacing: 0.8px; padding: 3px 10px; border-radius: 99px; text-transform: uppercase;">STREAK BOOSTER</span>
-                        <span style="font-size: 10px; color: var(--muted); font-weight: 600;">Hari Ini 08:00 WIB</span>
-                    </div>
-                    <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 800; color: var(--ink);">
-                        Selamat! 5 Hari Streak Glowing Berturut-turut! 🥳✨
-                    </h3>
-                    <p style="margin: 0 0 14px; color: var(--muted); font-size: 11px; line-height: 1.5;">
-                        Kamu makin konsisten merawat skin barrier. Tetap semangat mencapai kulit impian mu!
-                    </p>
-                    <button type="button" class="button button-secondary" style="font-size: 10px; height: 32px; padding: 0 16px; border-radius: 99px; background: white; color: #ab2c5d; border-color: #f7d5de;">
-                        📢 Bagikan Pencapaian
-                    </button>
-                </div>
-            </div>
+            @endforelse
 
         </div>
 

@@ -25,6 +25,27 @@
     let toastTimer;
     let storageAvailable = true;
 
+    async function apiCall(url, method, data = null) {
+        const token = document.querySelector('meta[name="csrf-token"]')?.content;
+        const options = {
+            method,
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': token || '',
+            },
+        };
+        if (data) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(data);
+        }
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.message || 'Request gagal');
+        }
+        return response.json();
+    }
+
     function notify(message) {
         if (!toast) return;
         toast.textContent = message;
@@ -71,8 +92,8 @@
         && typeof item.condition === 'string' && Array.isArray(item.products)
         && Array.isArray(item.symptoms) && typeof item.note === 'string';
 
-    let products = loadCollection(PRODUCT_KEY, isProduct);
-    let journals = loadCollection(JOURNAL_KEY, isJournal) ?? [];
+    let products = window.__INITIAL_PRODUCTS__ ?? loadCollection(PRODUCT_KEY, isProduct);
+    let journals = window.__INITIAL_JOURNALS__ ?? loadCollection(JOURNAL_KEY, isJournal) ?? [];
     if (products === null) {
         products = starterProducts;
         saveCollection(PRODUCT_KEY, products);
@@ -179,22 +200,33 @@
             const toggle = createElement('button', 'product-toggle', product.status === 'active' ? 'Istirahatkan' : 'Gunakan lagi');
             toggle.type = 'button';
             toggle.setAttribute('aria-label', `${product.status === 'active' ? 'Istirahatkan' : 'Gunakan kembali'} ${product.name}`);
-            toggle.addEventListener('click', () => {
-                products = products.map((item) => item.id === product.id
-                    ? { ...item, status: item.status === 'active' ? 'paused' : 'active' }
-                    : item);
-                if (saveProducts()) notify(`${product.name} ${product.status === 'active' ? 'diistirahatkan' : 'digunakan kembali'}.`);
-                renderCatalog();
+            toggle.addEventListener('click', async () => {
+                const newStatus = product.status === 'active' ? 'paused' : 'active';
+                try {
+                    await apiCall(`/products/${product.id}`, 'PUT', { status: newStatus });
+                    products = products.map((item) => item.id === product.id
+                        ? { ...item, status: newStatus }
+                        : item);
+                    notify(`${product.name} ${newStatus === 'paused' ? 'diistirahatkan' : 'digunakan kembali'}.`);
+                    renderCatalog();
+                } catch (error) {
+                    notify('Gagal update status produk. Coba lagi.');
+                    console.error(error);
+                }
             });
             const remove = createElement('button', 'product-delete', 'Hapus');
             remove.type = 'button';
             remove.setAttribute('aria-label', `Hapus ${product.name}`);
-            remove.addEventListener('click', () => {
+            remove.addEventListener('click', async () => {
                 if (!window.confirm(`Hapus ${product.name} dari katalog?`)) return;
-                products = products.filter((item) => item.id !== product.id);
-                if (saveProducts()) {
+                try {
+                    await apiCall(`/products/${product.id}`, 'DELETE');
+                    products = products.filter((item) => item.id !== product.id);
                     renderCatalog();
                     notify('Produk dihapus dari katalog.');
+                } catch (error) {
+                    notify('Gagal hapus produk. Coba lagi.');
+                    console.error(error);
                 }
             });
             actionButtons.append(toggle, remove);
@@ -232,31 +264,34 @@
         dialog.querySelectorAll('[data-close-dialog]').forEach((button) => {
             button.addEventListener('click', () => dialog.close());
         });
-        form.addEventListener('submit', (event) => {
+        form.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!form.reportValidity()) return;
 
             const values = new FormData(form);
-            const name = String(values.get('name') ?? '').trim();
-            const brand = String(values.get('brand') ?? '').trim();
-            if (products.some((product) => product.name.toLocaleLowerCase('id') === name.toLocaleLowerCase('id'))) {
-                notify('Produk dengan nama tersebut sudah ada di katalog.');
-                return;
-            }
-            products.unshift({
-                id: makeId(),
-                name,
-                brand,
+            const payload = {
+                name: String(values.get('name') ?? '').trim(),
+                brand: String(values.get('brand') ?? '').trim(),
                 category: String(values.get('category')),
                 ingredient: String(values.get('ingredient') ?? '').trim(),
                 routine: String(values.get('routine')),
-                status: 'active',
-            });
-            if (saveProducts()) {
+            };
+
+            if (products.some((product) => product.name.toLocaleLowerCase('id') === payload.name.toLocaleLowerCase('id'))) {
+                notify('Produk dengan nama tersebut sudah ada di katalog.');
+                return;
+            }
+
+            try {
+                const result = await apiCall('/products', 'POST', payload);
+                products.unshift(result.product);
                 renderCatalog();
                 notify('Produk berhasil ditambahkan ke katalog.');
                 form.reset();
                 dialog.close();
+            } catch (error) {
+                notify('Gagal menambah produk. Coba lagi.');
+                console.error(error);
             }
         });
     }
@@ -328,8 +363,9 @@
             });
         });
 
-        form.addEventListener('submit', (event) => {
+        form.addEventListener('submit', async (event) => {
             event.preventDefault();
+
             const selectedCondition = form.querySelector('[data-condition][aria-pressed="true"]');
             if (!selectedCondition) {
                 notify('Pilih kondisi kulitmu sebelum menyimpan jurnal.');
@@ -338,21 +374,22 @@
             }
 
             const values = new FormData(form);
-            const symptoms = values.getAll('symptoms').map(String);
-            const entry = {
-                id: makeId(),
+            const payload = {
                 type,
                 date: String(values.get('date')),
-                savedAt: new Date().toISOString(),
                 condition: selectedCondition.dataset.condition,
-                products: values.getAll('products').map(String).map((id) => products.find((product) => product.id === id)?.name).filter(Boolean),
-                symptoms: symptoms.includes('Tidak ada') ? [] : symptoms,
+                products: values.getAll('products').map(String),
+                symptoms: values.getAll('symptoms').map(String).filter((s) => s !== 'Tidak ada'),
                 note: String(values.get('note') ?? '').trim(),
             };
-            journals = [entry, ...journals];
-            if (saveJournals()) {
+
+            try {
+                await apiCall('/journals', 'POST', payload);
                 notify(`Jurnal ${type === 'morning' ? 'pagi' : 'malam'} berhasil disimpan.`);
                 window.setTimeout(() => window.location.assign('/jurnal/riwayat'), 650);
+            } catch (error) {
+                notify('Gagal menyimpan jurnal. Coba lagi.');
+                console.error(error);
             }
         });
     }
@@ -372,7 +409,7 @@
         const filtered = journals.filter((entry) => {
             const searchableText = `${entry.condition} ${entry.note} ${entry.symptoms.join(' ')} ${entry.products.join(' ')}`.toLocaleLowerCase('id');
             return (type === 'all' || entry.type === type) && searchableText.includes(query);
-        }).sort((first, second) => second.date.localeCompare(first.date) || (second.savedAt ?? '').localeCompare(first.savedAt ?? ''));
+        }).sort((first, second) => second.date.localeCompare(first.date));
 
         setText('[data-history-count]', journals.length);
         setText('#history-result-count', `${filtered.length} catatan`);
@@ -409,12 +446,19 @@
 
             const remove = createElement('button', 'history-delete', 'Hapus catatan');
             remove.type = 'button';
-            remove.addEventListener('click', () => {
+            remove.addEventListener('click', async () => {
                 if (!window.confirm('Hapus catatan jurnal ini? Tindakan ini tidak dapat dibatalkan.')) return;
-                journals = journals.filter((item) => item.id !== entry.id);
-                if (saveJournals()) {
+                const idsToDelete = entry.ids || [entry.id];
+                try {
+                    for (const jid of idsToDelete) {
+                        await apiCall(`/journals/${jid}`, 'DELETE');
+                    }
+                    journals = journals.filter((item) => item.id !== entry.id);
                     notify('Catatan jurnal dihapus.');
                     renderHistory();
+                } catch (error) {
+                    notify('Gagal menghapus jurnal. Coba lagi.');
+                    console.error(error);
                 }
             });
             card.append(dateBadge, content, remove);

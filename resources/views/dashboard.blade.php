@@ -11,7 +11,7 @@
         <div>
             <p class="eyebrow"><span class="eyebrow-dot"></span> PAGI HARI • RITUAL PERCAYA DIRI</p>
             <h1 style="margin: 8px 0 10px; font-size: clamp(24px, 3.5vw, 32px); font-weight: 800; letter-spacing: -1px; color: var(--ink);">
-                Selamat Datang Kembali, <br>Clara! 🌸✨
+                Selamat Datang Kembali, <br>{{ auth()->user()->nama_user ?? 'User' }}! 🌸✨
             </h1>
             <p class="intro-copy" style="max-width: 520px; font-size: 12px; color: var(--muted);">
                 Kulitmu bersinar sehat hari ini. Lanjutkan rutinitas lembutmu dan perhatikan respon kulit terhadap cuaca lembap pagi ini!
@@ -40,7 +40,7 @@
             <div>
                 <span style="font-size: 8px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px;">KONSISTENSI</span>
                 <div style="display: flex; align-items: baseline; gap: 6px; margin: 2px 0;">
-                    <strong style="font-size: 24px; font-weight: 800; color: var(--rose);">5 Hari</strong>
+                    <strong style="font-size: 24px; font-weight: 800; color: var(--rose);">{{ $streak }} Hari</strong>
                     <span style="font-size: 9px; font-weight: 700; color: var(--green); background: #eef7f2; padding: 2px 6px; border-radius: 99px;">+1 hari ini</span>
                 </div>
                 <p style="margin: 0; font-size: 10px; color: var(--muted);">Streak berturut-turut 🔥</p>
@@ -115,7 +115,7 @@
                         <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--ink); display: flex; align-items: center; gap: 8px;">
                             📖 Jurnal Hari Ini
                         </h3>
-                        <p style="margin: 2px 0 0; font-size: 10px; color: var(--muted);">Jumat, 24 Oktober 2026</p>
+                        <p style="margin: 2px 0 0; font-size: 10px; color: var(--muted);">{{ $tanggalHariIni }}</p>
                     </div>
                     <span style="background: var(--rose-pale); color: var(--rose); padding: 4px 12px; border-radius: 99px; font-size: 9px; font-weight: 800;">
                         Pagi Selesai, Malam Belum Diisi 🍷
@@ -133,25 +133,32 @@
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div style="background: #fdf2f4; border: 1px solid #f7d5de; padding: 16px; border-radius: 16px;">
+                    <div style="background: {{ $jurnalPagiHariIni ? '#fdf2f4' : '#faf5f3' }}; border: 1px solid {{ $jurnalPagiHariIni ? '#f7d5de' : 'var(--line)' }}; padding: 16px; border-radius: 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <span style="font-size: 12px;">☀️</span>
-                            <span style="color: var(--green); font-size: 12px;">✓</span>
+                            @if ($jurnalPagiHariIni)
+                                <span style="color: var(--green); font-size: 12px;">✓</span>
+                            @endif
                         </div>
                         <h4 style="margin: 0 0 2px; font-size: 12px; font-weight: 800; color: var(--ink);">Rutinitas Pagi</h4>
-                        <p style="margin: 0; font-size: 9px; color: var(--green); font-weight: 700;">✓ Selesai • 07:45 WIB</p>
+                        <p style="margin: 0; font-size: 9px; color: {{ $jurnalPagiHariIni ? 'var(--green)' : 'var(--muted)' }}; font-weight: 700;">
+                            {{ $jurnalPagiHariIni ? '✓ Sudah dicatat' : 'Belum diisi' }}
+                        </p>
                     </div>
 
-                    <div style="background: #faf5f3; border: 1px solid var(--line); padding: 16px; border-radius: 16px; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="background: {{ $jurnalMalamHariIni ? '#fdf2f4' : '#faf5f3' }}; border: 1px solid {{ $jurnalMalamHariIni ? '#f7d5de' : 'var(--line)' }}; padding: 16px; border-radius: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <span style="font-size: 12px;">🌙</span>
-                            <!-- Button Isi Nanti -> Jurnal Kulit Malam -->
-                            <a href="{{ route('jurnal.malam') }}" class="button button-primary" style="font-size: 8px; padding: 3px 10px; height: auto; background: var(--rose); border-radius: 99px;">Isi Nanti</a>
+                            @if (!$jurnalMalamHariIni)
+                                <a href="{{ route('jurnal.malam') }}" class="button button-primary" style="font-size: 8px; padding: 3px 10px; height: auto; background: var(--rose); border-radius: 99px;">Isi Sekarang</a>
+                            @else
+                                <span style="color: var(--green); font-size: 12px;">✓</span>
+                            @endif
                         </div>
-                        <div>
-                            <h4 style="margin: 0 0 2px; font-size: 12px; font-weight: 800; color: var(--ink);">Rutinitas Malam</h4>
-                            <p style="margin: 0; font-size: 9px; color: var(--muted);">Tercatat: Belum diisi</p>
-                        </div>
+                        <h4 style="margin: 0 0 2px; font-size: 12px; font-weight: 800; color: var(--ink);">Rutinitas Malam</h4>
+                        <p style="margin: 0; font-size: 9px; color: {{ $jurnalMalamHariIni ? 'var(--green)' : 'var(--muted)' }}; font-weight: 700;">
+                            {{ $jurnalMalamHariIni ? '✓ Sudah dicatat' : 'Belum diisi' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -166,7 +173,7 @@
                         <p style="margin: 2px 0 0; font-size: 10px; color: var(--muted);">Dicatat semalam (Pukul 22:15 WIB)</p>
                     </div>
                     <span style="background: #eef7f2; color: var(--green); padding: 5px 12px; border-radius: 99px; font-size: 9px; font-weight: 800;">
-                        Aman / Glowing ✨
+                        {{ $jurnalTerakhir?->kondisi_kulit ?? 'Belum ada data' }} ✨
                     </span>
                 </div>
 
@@ -229,7 +236,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                     <div>
                         <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--ink);">📦 Koleksi Skincare</h3>
-                        <p style="margin: 2px 0 0; font-size: 10px; color: var(--muted);">Total 7 Produk Terdaftar</p>
+                        <p style="margin: 2px 0 0; font-size: 10px; color: var(--muted);">Total {{ $totalProduk }} Produk Terdaftar</p>
                     </div>
                     <!-- Kelola Lemari -> Katalog -->
                     <a href="{{ route('katalog') }}" style="color: var(--rose); font-size: 10px; font-weight: 800; text-decoration: none;">Kelola Lemari →</a>
@@ -238,14 +245,14 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                     <div style="background: #faf5f3; border: 1px solid var(--line); padding: 16px; border-radius: 16px; text-align: center;">
                         <span style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: #eef7f2; color: var(--green); font-size: 12px; line-height: 24px; margin-bottom: 6px;">✓</span>
-                        <strong style="display: block; font-size: 20px; font-weight: 800; color: var(--ink);">5</strong>
+                        <strong style="display: block; font-size: 20px; font-weight: 800; color: var(--ink);">{{ $produkAktif }}</strong>
                         <span style="font-size: 10px; font-weight: 800; color: var(--ink);">Sedang Aktif</span>
                         <p style="margin: 2px 0 0; font-size: 8px; color: var(--muted);">Dipakai rutin harian</p>
                     </div>
 
                     <div style="background: #faf5f3; border: 1px solid var(--line); padding: 16px; border-radius: 16px; text-align: center;">
                         <span style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: #fdf2f4; color: var(--rose); font-size: 12px; line-height: 24px; margin-bottom: 6px;">⏸</span>
-                        <strong style="display: block; font-size: 20px; font-weight: 800; color: var(--ink);">2</strong>
+                        <strong style="display: block; font-size: 20px; font-weight: 800; color: var(--ink);">{{ $produkStop }}</strong>
                         <span style="font-size: 10px; font-weight: 800; color: var(--ink);">Stop / Dijeda</span>
                         <p style="margin: 2px 0 0; font-size: 8px; color: var(--muted);">Dalam pengujian alergi</p>
                     </div>

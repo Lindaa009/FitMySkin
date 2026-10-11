@@ -60,33 +60,40 @@
                         <button type="button" id="tab-register" onclick="switchMode('register')" style="flex: 1; padding: 10px; border: none; border-radius: 10px; background: transparent; font-weight: 800; font-size: 10px; cursor: pointer; color: var(--muted);">Daftar Akun Baru</button>
                     </div>
 
-                    <form action="{{ route('dashboard') }}" method="GET" style="display: grid; gap: 14px;">
-                        <div id="field-nama" class="form-field" style="display: none;">
-                            <label>Nama Lengkap <span style="color: var(--rose);">*wajib</span></label>
-                            <input type="text" placeholder="nama lengkap kamu">
-                        </div>
+                   <form id="auth-form" action="{{ route('login.post') }}" method="POST" style="display: grid; gap: 14px;">
+                    @csrf
 
-                        <div class="form-field">
-                            <label>Alamat Email</label>
-                            <input type="email" placeholder="nama.kamu@email.com" required>
-                        </div>
+                    <div id="field-nama" class="form-field" style="display: none;">
+                        <label>Nama Lengkap <span style="color: var(--rose);">*wajib</span></label>
+                        <input type="text" name="nama_user" placeholder="nama lengkap kamu">
+                    </div>
 
-                        <div class="form-field">
-                            <label>Kata Sandi / Password</label>
-                            <input type="password" placeholder="••••••••" required>
-                        </div>
+                    <div class="form-field">
+                        <label>Alamat Email</label>
+                        <input type="email" name="alamat_email" placeholder="nama.kamu@email.com" required>
+                    </div>
 
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px;">
-                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" style="accent-color: var(--rose);"> Ingat Saya
-                            </label>
-                            <a href="#" style="color: var(--rose); font-weight: 700;">Lupa sandi?</a>
-                        </div>
+                    <div class="form-field">
+                        <label>Kata Sandi / Password</label>
+                        <input type="password" name="password" placeholder="••••••••" required>
+                    </div>
 
-                        <button type="submit" id="btn-submit" class="button button-primary" style="width: 100%; margin-top: 6px;">
-                            Masuk Sekarang ✨
-                        </button>
-                    </form>
+                    <div id="field-confirm" class="form-field" style="display: none;">
+                        <label>Konfirmasi Password</label>
+                        <input type="password" name="password_confirmation" placeholder="ulangi password">
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" name="remember" style="accent-color: var(--rose);"> Ingat Saya
+                        </label>
+                        <a href="#" style="color: var(--rose); font-weight: 700;">Lupa sandi?</a>
+                    </div>
+
+                    <button type="submit" id="btn-submit" class="button button-primary" style="width: 100%; margin-top: 6px;">
+                        Masuk Sekarang ✨
+                    </button>
+                </form>
                 </div>
 
                 <p style="margin: 20px 0 0; text-align: center; color: var(--muted); font-size: 9px;">

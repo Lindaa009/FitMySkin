@@ -1,30 +1,43 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\JournalController;
+use App\Http\Controllers\AnalisisController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RoutineController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\NotifikasiController;
 
-Route::get('/', function () {
-    return view('auth.login-register');
-})->name('login');
+// Login & Register
+Route::get('/', [AuthController::class, 'showLoginRegister'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Halaman yang butuh login
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    // Product CRUD
+    Route::get('/katalog', [ProductController::class, 'index'])->name('katalog');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
 
-Route::get('/notifikasi', function () {
-    return view('notifikasi');
-})->name('notifikasi');
+    // Jurnal
+    Route::get('/jurnal/pagi', [JournalController::class, 'morning'])->name('jurnal.pagi');
+    Route::get('/jurnal/malam', [JournalController::class, 'evening'])->name('jurnal.malam');
+    Route::get('/jurnal/riwayat', [JournalController::class, 'history'])->name('jurnal.riwayat');
+    Route::post('/journals', [JournalController::class, 'store'])->name('journals.store');
+    Route::delete('/journals/{id}', [JournalController::class, 'destroy'])->name('journals.destroy');
 
-Route::get('/profil', function () {
-    return view('profil');
-})->name('profil');
-
-Route::get('/profil/kelola-langkah', function () {
-    return view('kelola-langkah');
-})->name('profil.langkah');
-
-Route::view('/katalog', 'katalog.index')->name('katalog');
-Route::view('/jurnal/pagi', 'jurnal.pagi')->name('jurnal.pagi');
-Route::view('/jurnal/malam', 'jurnal.malam')->name('jurnal.malam');
-Route::view('/jurnal/riwayat', 'jurnal.riwayat')->name('jurnal.riwayat');
-Route::view('/analisis/kecocokan', 'analisis.kecocokan')->name('analisis.kecocokan');
+    // Halaman lain
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
+    Route::get('/profil', [ProfileController::class, 'index'])->name('profil');
+    Route::put('/profil', [ProfileController::class, 'update'])->name('profil.update');
+    Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profil.password');
+    Route::get('/profil/kelola-langkah', [RoutineController::class, 'index'])->name('profil.langkah');
+    Route::post('/routines', [RoutineController::class, 'save'])->name('routines.save');
+    Route::get('/analisis/kecocokan', [AnalisisController::class, 'index'])->name('analisis.kecocokan');
+});

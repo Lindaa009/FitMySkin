@@ -105,4 +105,9 @@
             </div>
         </form>
     </dialog>
+
+    <script>
+        window.__INITIAL_PRODUCTS__ = @json($initialProducts);
+    </script>
+
 @endsection

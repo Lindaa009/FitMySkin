@@ -40,4 +40,8 @@
         <span class="history-result-count" id="history-result-count"></span>
     </section>
     <section class="history-list" id="history-list" aria-live="polite"></section>
+
+    <script>
+        window.__INITIAL_JOURNALS__ = {!! json_encode($initialJournals) !!};
+    </script>
 @endsection

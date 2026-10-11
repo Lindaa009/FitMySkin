@@ -28,13 +28,13 @@
 
             <!-- TOMBOL HEADER AKSI -->
             <div style="display: flex; gap: 10px;">
-                <button type="button" class="button button-secondary" style="border-radius: 99px; font-size: 11px; padding: 0 18px; background: white;">
+                <button type="button" id="btn-reset-routine" class="button button-secondary" style="border-radius: 99px; font-size: 11px; padding: 0 18px; background: white; cursor: pointer;">
                     🔄 Reset Default
                 </button>
                 <!-- Simpan Urutan -> Kembali ke Profil -->
-                <a href="{{ route('profil') }}" class="button button-primary" style="border-radius: 99px; font-size: 11px; padding: 0 22px; background: #ab2c5d;">
+                <button type="button" id="btn-save-routine" class="button button-primary" style="border-radius: 99px; font-size: 11px; padding: 0 22px; background: #ab2c5d; cursor: pointer;">
                     ✨ Simpan Urutan ✨
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -78,12 +78,23 @@
                 </div>
 
                 <div style="display: flex; gap: 8px;">
-                    <select style="min-height: 36px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line); font-size: 10px; background: white; outline: none; cursor: pointer;">
+                    <select id="add-step-select" style="min-height: 36px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line); font-size: 10px; background: white; outline: none; cursor: pointer;">
                         <option value="">Pilih Jenis Produk</option>
-                        <option>Micellar Water</option>
-                        <option>Exfoliating Toner</option>
-                        <option>Eye Cream</option>
-                        <option>Sleeping Mask</option>
+                        <option value="Micellar Water">Micellar Water</option>
+                        <option value="Facial Wash">Facial Wash</option>
+                        <option value="Cleansing Oil">Cleansing Oil</option>
+                        <option value="Toner">Toner</option>
+                        <option value="Exfoliating Toner">Exfoliating Toner</option>
+                        <option value="Essence">Essence</option>
+                        <option value="Serum">Serum</option>
+                        <option value="Ampoule">Ampoule</option>
+                        <option value="Eye Cream">Eye Cream</option>
+                        <option value="Moisturizer">Moisturizer</option>
+                        <option value="Facial Oil">Facial Oil</option>
+                        <option value="Sunscreen">Sunscreen</option>
+                        <option value="Sleeping Mask">Sleeping Mask</option>
+                        <option value="Sheet Mask">Sheet Mask</option>
+                        <option value="Spot Treatment">Spot Treatment</option>
                     </select>
                     <button type="button" class="button button-primary" style="background: #ef6b94; font-size: 10px; height: 36px; padding: 0 16px; border-radius: 12px;">
                         + Sisipkan
@@ -173,48 +184,84 @@
 
 @push('scripts')
 <script>
-    const dataPagi = [
-        { num: '01', title: 'Facial Wash', desc: 'Langkah 1: Pembersih' },
-        { num: '02', title: 'Toner', desc: 'Langkah 2: Penyeimbang' },
-        { num: '03', title: 'Serum', desc: 'Langkah 3: Perawatan Khusus' },
-        { num: '04', title: 'Moisturizer', desc: 'Langkah 4: Pengunci' },
-        { num: '05', title: 'Sunscreen', desc: 'Langkah 5: Perlindungan Terluar' }
-    ];
+    // Data dari server
+    let routineData = @json($initialRoutine);
+    let currentType = 'pagi';
 
-    const dataMalam = [
-        { num: '01', title: 'Facial Wash', desc: 'Langkah 1: Pembersih' },
-        { num: '02', title: 'Toner', desc: 'Langkah 2: Penyeimbang' },
-        { num: '03', title: 'Serum', desc: 'Langkah 3: Perawatan Khusus' },
-        { num: '04', title: 'Moisturizer', desc: 'Langkah 4: Pengunci' }
-    ];
+    // Ambil CSRF
+    function getCsrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.content || '';
+    }
 
-    function renderRoutine(items) {
+    // Notifikasi pakai toast global kalau ada
+    function showToast(msg) {
+        const toast = document.querySelector('#app-toast');
+        if (toast) {
+            toast.textContent = msg;
+            toast.classList.add('is-visible');
+            setTimeout(() => toast.classList.remove('is-visible'), 3000);
+        } else {
+            alert(msg);
+        }
+    }
+
+    // Render daftar langkah
+    function renderRoutine(type) {
         const container = document.getElementById('routine-list');
         if (!container) return;
+        const items = routineData[type] || [];
 
-        container.innerHTML = items.map(item => `
+        if (items.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 32px; color: var(--muted); font-size: 11px;">
+                    Belum ada langkah untuk rutinitas ${type}. Tambahkan langkah baru di bawah.
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = items.map((item, index) => `
             <div class="journal-card" style="padding: 16px 20px; border-radius: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                 <div style="display: flex; align-items: center; gap: 14px;">
-                    <span style="color: #c4b5b9; cursor: grab; font-size: 12px;">:::</span>
+                    <span style="color: #c4b5b9; font-size: 12px;">:::</span>
                     <span style="background: #fdf2f4; color: #ab2c5d; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 800;">
-                        ${item.num}
+                        ${String(index + 1).padStart(2, '0')}
                     </span>
                     <div>
                         <h3 style="margin: 0; font-size: 13px; font-weight: 800; color: var(--ink);">${item.title}</h3>
-                        <p style="margin: 2px 0 0; font-size: 9px; color: var(--muted); font-weight: 600;">${item.desc}</p>
+                        <p style="margin: 2px 0 0; font-size: 9px; color: var(--muted); font-weight: 600;">${item.desc || ''}</p>
                     </div>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 12px; color: var(--muted);">
-                    <button type="button" style="border: none; background: transparent; cursor: pointer; color: var(--muted); font-size: 10px;">▲</button>
-                    <button type="button" style="border: none; background: transparent; cursor: pointer; color: var(--muted); font-size: 10px;">▼</button>
-                    <button type="button" style="border: none; background: transparent; cursor: pointer; color: var(--muted); font-size: 12px;">🗑️</button>
+                    <button type="button" data-action="up" data-index="${index}" style="border: none; background: transparent; cursor: pointer; color: var(--muted); font-size: 10px;">▲</button>
+                    <button type="button" data-action="down" data-index="${index}" style="border: none; background: transparent; cursor: pointer; color: var(--muted); font-size: 10px;">▼</button>
+                    <button type="button" data-action="delete" data-index="${index}" style="border: none; background: transparent; cursor: pointer; color: var(--muted); font-size: 12px;">🗑️</button>
                 </div>
             </div>
         `).join('');
+
+        // Pasang event listener untuk tombol
+        container.querySelectorAll('button[data-action]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.dataset.action;
+                const idx = parseInt(btn.dataset.index);
+
+                if (action === 'up' && idx > 0) {
+                    [routineData[type][idx - 1], routineData[type][idx]] = [routineData[type][idx], routineData[type][idx - 1]];
+                } else if (action === 'down' && idx < routineData[type].length - 1) {
+                    [routineData[type][idx + 1], routineData[type][idx]] = [routineData[type][idx], routineData[type][idx + 1]];
+                } else if (action === 'delete') {
+                    routineData[type].splice(idx, 1);
+                }
+                renderRoutine(type);
+            });
+        });
     }
 
+    // Tab switching
     function switchRoutine(type) {
+        currentType = type;
         const tabPagi = document.getElementById('tab-pagi');
         const tabMalam = document.getElementById('tab-malam');
 
@@ -225,7 +272,6 @@
             tabPagi.style.background = 'transparent';
             tabPagi.style.color = 'var(--ink)';
             tabPagi.style.boxShadow = 'none';
-            renderRoutine(dataMalam);
         } else {
             tabPagi.style.background = 'white';
             tabPagi.style.color = '#ab2c5d';
@@ -233,13 +279,109 @@
             tabMalam.style.background = 'transparent';
             tabMalam.style.color = 'var(--ink)';
             tabMalam.style.boxShadow = 'none';
-            renderRoutine(dataPagi);
         }
+        renderRoutine(type);
     }
 
-    // Default Render awal saat halaman dibuka
+    // Tambah langkah
+    function setupAddStep() {
+        const select = document.getElementById('add-step-select');
+        if (!select) return;
+
+        // Cari tombol "Sisipkan"
+        let sisipkanBtn = null;
+        document.querySelectorAll('button').forEach(b => {
+            if (b.textContent.includes('Sisipkan')) sisipkanBtn = b;
+        });
+        if (!sisipkanBtn) return;
+
+        sisipkanBtn.addEventListener('click', () => {
+            const val = select.value;
+            if (!val) {
+                showToast('Pilih jenis produk dulu.');
+                return;
+            }
+            routineData[currentType].push({
+                title: val,
+                desc: `Langkah ${routineData[currentType].length + 1}: ${val}`
+            });
+            select.value = '';
+            renderRoutine(currentType);
+        });
+    }
+
+    // Save routine
+    function setupSave() {
+        const btn = document.getElementById('btn-save-routine');
+        if (!btn) return;
+
+        btn.addEventListener('click', async () => {
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Menyimpan...';
+
+                const res = await fetch('/routines', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                    },
+                    body: JSON.stringify({
+                        pagi: routineData.pagi,
+                        malam: routineData.malam,
+                    }),
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.message || 'Gagal menyimpan.');
+                }
+
+                showToast('✅ Urutan rutinitas berhasil disimpan.');
+                btn.textContent = '✨ Simpan Urutan ✨';
+                btn.disabled = false;
+            } catch (e) {
+                console.error(e);
+                showToast('❌ Gagal menyimpan: ' + e.message);
+                btn.textContent = '✨ Simpan Urutan ✨';
+                btn.disabled = false;
+            }
+        });
+    }
+
+    // Reset ke default
+    function setupReset() {
+        const btn = document.getElementById('btn-reset-routine');
+        if (!btn) return;
+
+        btn.addEventListener('click', () => {
+            if (!confirm('Reset urutan ke pengaturan default? Perubahan yang belum disimpan akan hilang.')) return;
+            
+            routineData.pagi = [
+                { title: 'Facial Wash', desc: 'Langkah 1: Pembersih' },
+                { title: 'Toner', desc: 'Langkah 2: Penyeimbang' },
+                { title: 'Serum', desc: 'Langkah 3: Perawatan Khusus' },
+                { title: 'Moisturizer', desc: 'Langkah 4: Pengunci' },
+                { title: 'Sunscreen', desc: 'Langkah 5: Perlindungan Terluar' },
+            ];
+            routineData.malam = [
+                { title: 'Facial Wash', desc: 'Langkah 1: Pembersih' },
+                { title: 'Toner', desc: 'Langkah 2: Penyeimbang' },
+                { title: 'Serum', desc: 'Langkah 3: Perawatan Khusus' },
+                { title: 'Moisturizer', desc: 'Langkah 4: Pengunci' },
+            ];
+            renderRoutine(currentType);
+            showToast('🔄 Urutan direset ke default. Jangan lupa klik Simpan.');
+        });
+    }
+
+    // Init
     document.addEventListener('DOMContentLoaded', () => {
-        renderRoutine(dataPagi);
+        renderRoutine('pagi');
+        setupAddStep();
+        setupSave();
+        setupReset();
     });
 </script>
 @endpush
