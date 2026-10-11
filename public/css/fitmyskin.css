@@ -397,3 +397,214 @@ button { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+/* ANIMASI TRANSITION - FASE 2D */
+
+/* 1. Fade-in halaman saat load */
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+body {
+    animation: pageFadeIn 0.4s ease-out;
+}
+
+/* 2. Smooth scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 3. Button press animation */
+.button {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button:active {
+    transform: scale(0.97);
+}
+
+/* Efek "ripple" saat tombol diklik */
+.button::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease, opacity 0.4s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.button:active::after {
+    width: 200px;
+    height: 200px;
+    opacity: 1;
+    transition: 0s;
+}
+
+/* 4. Card hover - naik + shadow */
+.journal-card,
+.product-card,
+.history-entry,
+.aside-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.journal-card:hover,
+.product-card:hover,
+.history-entry:hover,
+.aside-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 38px rgba(103, 53, 69, 0.09);
+}
+
+/* 5. Navbar shadow saat scroll */
+.site-header {
+    transition: box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.site-header.scrolled {
+    box-shadow: 0 4px 24px rgba(103, 53, 69, 0.08);
+    background: rgba(255, 255, 255, 0.98);
+}
+
+/* 6. Toast animation (polish) */
+.toast {
+    transition: opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toast.is-visible {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+/* 7. Modal animation */
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#confirm-modal > div,
+#modal-sukses > div {
+    animation: modalPop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 8. Link underline animation */
+.main-navigation a {
+    position: relative;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.main-navigation a::before {
+    content: "";
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--rose);
+    transition: width 0.25s ease, left 0.25s ease;
+    border-radius: 2px;
+}
+
+.main-navigation a:hover::before,
+.main-navigation a[aria-current="page"]::before {
+    width: calc(100% - 24px);
+    left: 12px;
+}
+
+/* 9. Input focus animation */
+.form-field input,
+.form-field textarea,
+.form-field select,
+.search-field input,
+.select-field select {
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.15s ease;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus,
+.search-field input:focus,
+.select-field select:focus {
+    transform: translateY(-1px);
+}
+
+/* 10. Stagger animation untuk card list */
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.history-entry,
+.product-card {
+    animation: cardSlideIn 0.35s ease-out backwards;
+}
+
+.history-entry:nth-child(1),
+.product-card:nth-child(1) { animation-delay: 0.02s; }
+.history-entry:nth-child(2),
+.product-card:nth-child(2) { animation-delay: 0.06s; }
+.history-entry:nth-child(3),
+.product-card:nth-child(3) { animation-delay: 0.10s; }
+.history-entry:nth-child(4),
+.product-card:nth-child(4) { animation-delay: 0.14s; }
+.history-entry:nth-child(5),
+.product-card:nth-child(5) { animation-delay: 0.18s; }
+
+/* 11. Scrollbar cantik */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e5cfd5;
+    border-radius: 99px;
+    transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--rose);
+}
+
+/* 12. Reduce motion untuk user yang sensitif */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

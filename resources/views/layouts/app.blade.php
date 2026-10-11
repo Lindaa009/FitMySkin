@@ -101,6 +101,20 @@
     }
     </style>
     <script src="{{ asset('js/fitmyskin.js') }}" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('.site-header');
+            if (!header) return;
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 10) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            }, { passive: true });
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>

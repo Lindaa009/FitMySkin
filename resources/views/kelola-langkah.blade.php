@@ -322,15 +322,26 @@
 
                 if (action === 'up' && idx > 0) {
                     [routineData[type][idx - 1], routineData[type][idx]] = [routineData[type][idx], routineData[type][idx - 1]];
+                    renderRoutine(type);
                 } else if (action === 'down' && idx < routineData[type].length - 1) {
                     [routineData[type][idx + 1], routineData[type][idx]] = [routineData[type][idx], routineData[type][idx + 1]];
+                    renderRoutine(type);
                 } else if (action === 'delete') {
-                    routineData[type].splice(idx, 1);
+                    const itemName = routineData[type][idx]?.title || 'langkah ini';
+                    const label = type === 'pagi' ? 'pagi' : 'malam';
+
+                    showConfirm(
+                        `Hapus "${itemName}" dari urutan rutinitas ${label}?`,
+                        () => {
+                            routineData[type].splice(idx, 1);
+                            renderRoutine(type);
+                            showToast(`🗑️ "${itemName}" dihapus dari urutan.`);
+                        },
+                        { title: 'Hapus Langkah?', icon: '🗑️', okText: 'Ya, Hapus' }
+                    );
                 }
-                renderRoutine(type);
             });
         });
-
         // Drag & Drop handler
         let dragSrcIndex = null;
 
