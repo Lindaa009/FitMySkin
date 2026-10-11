@@ -78,55 +78,82 @@ class NotifikasiController extends Controller
         ]);
     }
 
-    /**
-     * Cek apakah user pakai produk tertentu 2 hari berturut-turut.
-     */
     private function cekPemakaianBerturut($userId): ?array
     {
         $today = Carbon::today();
-        $yesterday = $today->copy()->subDay();
 
-        // Produk yang dipakai HARI INI
-        $produkHariIni = Journal::where('id_user', $userId)
-            ->whereDate('tanggal_pemakaian', $today)
-            ->whereNotNull('id_product')
-            ->pluck('id_product')
+        // 1. Ambil produk keras (Serum/Exfoliator) milik user
+        $produkKeras = Product::where('id_user', $userId)
+            ->whereIn('jenis_produk', ['Serum', 'Exfoliator'])
+            ->pluck('nama_produk', 'id_product')
             ->toArray();
 
-        if (empty($produkHariIni)) return null;
+        if (empty($produkKeras)) return null;
 
-        // Produk yang dipakai KEMARIN
-        $produkKemarin = Journal::where('id_user', $userId)
-            ->whereDate('tanggal_pemakaian', $yesterday)
-            ->whereNotNull('id_product')
-            ->pluck('id_product')
-            ->toArray();
+        // 2. Hitung pemakaian tiap produk keras dalam 7 hari terakhir
+        $tujuhHariLalu = $today->copy()->subDays(7)->format('Y-m-d');
+        $pemakaian = Journal::where('id_user', $userId)
+            ->whereIn('id_product', array_keys($produkKeras))
+            ->where('tanggal_pemakaian', '>=', $tujuhHariLalu . ' 00:00:00')
+            ->selectRaw('id_product, COUNT(DISTINCT DATE(tanggal_pemakaian)) as total_hari')
+            ->groupBy('id_product')
+            ->having('total_hari', '>=', 2)
+            ->orderByDesc('total_hari')
+            ->get();
 
-        // Cari irisan (produk yang dipakai 2 hari berturut)
-        $duplikat = array_intersect($produkHariIni, $produkKemarin);
+        if ($pemakaian->isEmpty()) return null;
 
-        if (empty($duplikat)) return null;
+        // 3. Ambil produk paling sering dipakai
+        $top = $pemakaian->first();
+        $namaProduk = $produkKeras[$top->id_product] ?? 'Produk';
+        $hariPakai = $top->total_hari;
 
-        // Ambil produk pertama yang duplikat
-        $pid = reset($duplikat);
-        $produk = Product::find($pid);
-        if (!$produk) return null;
+        // 4. Cek riwayat iritasi 7 hari terakhir
+        $adaIritasi = Journal::where('id_user', $userId)
+            ->whereIn('kondisi_kulit', ['Kemerahan', 'Perih', 'Iritasi'])
+            ->where('tanggal_pemakaian', '>=', $tujuhHariLalu . ' 00:00:00')
+            ->exists();
 
-        // Cek apakah produk ini bahan aktif keras (exfoliator / serum)
-        $jenis = strtolower($produk->jenis_produk ?? '');
-        $bahanKeras = ['exfoliator', 'serum'];
-        if (!in_array($jenis, $bahanKeras)) return null;
+        // 5. Tentukan severity
+        $severity = 'Rendah';
+        $icon = '⚠️';
+        $warnaLabel = 'WASPADA';
+
+        if ($hariPakai >= 4 || ($hariPakai >= 3 && $adaIritasi)) {
+            $severity = 'Tinggi';
+            $warnaLabel = 'WASPADA BREAKOUT';
+        } elseif ($hariPakai >= 3 || ($hariPakai >= 2 && $adaIritasi)) {
+            $severity = 'Sedang';
+            $warnaLabel = 'PERHATIAN';
+        }
+
+        // 6. Susun pesan
+        $pesan = "Kamu menggunakan {$namaProduk} sebanyak {$hariPakai} hari dalam seminggu terakhir.";
+        if ($adaIritasi) {
+            $pesan .= " Dan terdeteksi adanya iritasi pada kulitmu. ";
+        } else {
+            $pesan .= " ";
+        }
+
+        if ($severity === 'Tinggi') {
+            $pesan .= "Sangat disarankan untuk istirahatkan produk ini minimal 3 hari ke depan, cantik!";
+        } elseif ($severity === 'Sedang') {
+            $pesan .= "Coba beri jeda pemakaian agar skin barrier tetap sehat.";
+        } else {
+            $pesan .= "Tetap perhatikan respons kulitmu setelah pemakaian.";
+        }
 
         return [
             'tipe' => 'warning',
-            'icon' => '⚠️',
-            'label' => 'WASPADA BREAKOUT',
+            'icon' => $icon,
+            'label' => $warnaLabel,
             'waktu' => 'Hari ini',
-            'judul' => 'Peringatan Deteksi Bahan Aktif! 🚨',
-            'pesan' => "Kamu menggunakan {$produk->nama_produk} 2 hari berturut-turut. Jangan lupa beri jeda hidrasi barrier malam ini ya, cantik!",
+            'judul' => "Deteksi Bahan Aktif — Severity {$severity} 🚨",
+            'pesan' => $pesan,
             'aksi_link' => route('analisis.kecocokan'),
             'aksi_text' => 'Lihat Analisis Kecocokan',
             'aksi_style' => 'primary',
+            'severity' => $severity,
         ];
     }
 

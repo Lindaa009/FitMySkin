@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/jurnal/pagi', [JournalController::class, 'morning'])->name('jurnal.pagi');
     Route::get('/jurnal/malam', [JournalController::class, 'evening'])->name('jurnal.malam');
     Route::get('/jurnal/riwayat', [JournalController::class, 'history'])->name('jurnal.riwayat');
+    Route::get('/jurnal/export-pdf', [JournalController::class, 'exportPdf'])->name('jurnal.export-pdf');
     Route::post('/journals', [JournalController::class, 'store'])->name('journals.store');
     Route::delete('/journals/{id}', [JournalController::class, 'destroy'])->name('journals.destroy');
 

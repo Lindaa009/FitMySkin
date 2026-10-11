@@ -10,7 +10,14 @@
             <h1>Riwayat <span>jurnal</span></h1>
             <p class="intro-copy">Lihat kembali catatanmu dan temukan perubahan kulit dari hari ke hari.</p>
         </div>
-        <a class="button button-primary" href="{{ route('jurnal.pagi') }}">Tulis jurnal <span aria-hidden="true">+</span></a>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a class="button button-secondary" href="{{ route('jurnal.export-pdf') }}" style="border-radius: 99px;">
+                📄 Export PDF
+            </a>
+            <a class="button button-primary" href="{{ route('jurnal.pagi') }}">
+                Tulis jurnal <span aria-hidden="true">+</span>
+            </a>
+        </div>
     </section>
 
     <section class="history-summary" aria-label="Ringkasan jurnal">

@@ -37,7 +37,15 @@
                     </div>
                     <div style="flex-grow: 1;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="background: #fdf2f4; color: #ab2c5d; font-size: 8px; font-weight: 800; letter-spacing: 0.8px; padding: 3px 10px; border-radius: 99px; text-transform: uppercase;">{{ $notif['label'] }}</span>
+                            @php
+                                $labelColor = '#ab2c5d';
+                                $labelBg = '#fdf2f4';
+                                if (isset($notif['severity'])) {
+                                    if ($notif['severity'] === 'Tinggi') { $labelColor = '#fff'; $labelBg = '#BA1A1A'; }
+                                    elseif ($notif['severity'] === 'Sedang') { $labelColor = '#fff'; $labelBg = '#F57C00'; }
+                                }
+                            @endphp
+                            <span style="background: {{ $labelBg }}; color: {{ $labelColor }}; font-size: 8px; font-weight: 800; letter-spacing: 0.8px; padding: 3px 10px; border-radius: 99px; text-transform: uppercase;">{{ $notif['label'] }}</span>
                             <span style="font-size: 10px; color: var(--muted); font-weight: 600;">{{ $notif['waktu'] }}</span>
                         </div>
                         <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 800; color: var(--ink);">

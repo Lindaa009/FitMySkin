@@ -6,6 +6,7 @@ use App\Models\Journal;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
 class JournalController extends Controller
@@ -64,7 +65,7 @@ class JournalController extends Controller
             'routineCategories' => $this->getRoutineCategories($userId, 'malam'),
         ]);
     }
-    
+
     // Halaman riwayat
     public function history()
     {
@@ -92,6 +93,48 @@ class JournalController extends Controller
             ->values();
 
         return view('jurnal.riwayat', ['initialJournals' => $journals]);
+    }
+
+        public function exportPdf()
+    {
+        $userId = Auth::id();
+
+        // Ambil data jurnal (samakan logic dengan history)
+        $journals = Journal::with('product')
+            ->where('id_user', $userId)
+            ->orderBy('tanggal_pemakaian', 'desc')
+            ->orderBy('id_jurnal', 'desc')
+            ->get()
+            ->groupBy(fn ($j) => $j->tanggal_pemakaian . '|' . $j->jadwal_pemakaian . '|' . $j->kondisi_kulit . '|' . $j->catatan_jadwal)
+            ->map(function ($group) {
+                $first = $group->first();
+                $catatan = json_decode($first->catatan_jadwal, true) ?? [];
+                $tanggal = explode(' ', $first->tanggal_pemakaian)[0];
+
+                // Format tanggal Indonesia
+                $tanggalFormatted = \Carbon\Carbon::parse($tanggal)->translatedFormat('l, d F Y');
+
+                return [
+                    'date' => $tanggal,
+                    'date_formatted' => $tanggalFormatted,
+                    'type' => $first->jadwal_pemakaian === 'Malam' ? 'evening' : 'morning',
+                    'condition' => $first->kondisi_kulit,
+                    'products' => $group->pluck('product.nama_produk')->filter()->values()->toArray(),
+                    'symptoms' => $catatan['symptoms'] ?? [],
+                    'note' => $catatan['note'] ?? '',
+                ];
+            })
+            ->values();
+
+        $pdf = Pdf::loadView('Jurnal.export-pdf', [
+            'journals' => $journals,
+            'user' => Auth::user(),
+            'tanggalExport' => \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') . ' WIB',
+        ]);
+
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->download('FitMySkin-Jurnal-' . date('Y-m-d') . '.pdf');
     }
 
     // Simpan jurnal baru
