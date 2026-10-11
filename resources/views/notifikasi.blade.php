@@ -18,13 +18,13 @@
     </div>
 
     <!-- GRID UTAMA (2 KOLOM) -->
-    <div style="display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start;">
+    <div class="notifications-grid" style="display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start;">
 
         <!-- KOLOM KIRI: DAFTAR NOTIFIKASI -->
         <div style="display: grid; gap: 16px;">
 
             <!-- CARD 1: WASPADA BREAKOUT -->
-            <div class="journal-card" style="padding: 20px 24px; border-radius: 22px; display: flex; align-items: flex-start; gap: 18px; position: relative;">
+            <div class="journal-card" data-notification="skin-warning" style="padding: 20px 24px; border-radius: 22px; display: flex; align-items: flex-start; gap: 18px; position: relative;">
                 <div style="width: 44px; height: 44px; border-radius: 50%; background: #fdf2f4; border: 1px solid #f7d5de; display: grid; place-items: center; color: #ab2c5d; font-size: 18px; flex-shrink: 0; position: relative;">
                     ⚠️
                     <span style="position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: #ab2c5d; border-radius: 50%; border: 2px solid white;"></span>
@@ -41,8 +41,8 @@
                         Kamu menggunakan Glycolic Acid Exfoliating Brightening 2 malam berturut-turut. Jangan lupa beri jeda hidrasi barrier malam ini ya, cantik!
                     </p>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <a href="#" class="button button-primary" style="font-size: 10px; height: 32px; padding: 0 14px; border-radius: 99px; background: #ab2c5d;">Lihat Analisis Kecocokan</a>
-                        <button type="button" class="button button-secondary" style="font-size: 10px; height: 32px; padding: 0 14px; border-radius: 99px; background: #faf5f3; border-color: transparent; color: var(--ink);">Tandai Sudah Paham</button>
+                        <a href="{{ route('analisis.kecocokan') }}" class="button button-primary" style="font-size: 10px; height: 32px; padding: 0 14px; border-radius: 99px; background: #ab2c5d;">Lihat Analisis Kecocokan</a>
+                        <button type="button" data-dismiss-notification class="button button-secondary" style="font-size: 10px; height: 32px; padding: 0 14px; border-radius: 99px; background: #faf5f3; border-color: transparent; color: var(--ink);">Tandai Sudah Paham</button>
                     </div>
                 </div>
             </div>
@@ -63,7 +63,7 @@
                     <p style="margin: 0 0 14px; color: var(--muted); font-size: 11px; line-height: 1.5;">
                         Pukul 21:00 WIB. Kulitmu butuh nutrisi sebelum tidur pulas. Yuk centang produk malam ini!
                     </p>
-                    <a href="#" class="button button-primary" style="font-size: 10px; height: 32px; padding: 0 16px; border-radius: 99px; background: #ef6b94;">Buka Jurnal Sekarang →</a>
+                    <a href="{{ route('jurnal.malam') }}" class="button button-primary" style="font-size: 10px; height: 32px; padding: 0 16px; border-radius: 99px; background: #ef6b94;">Buka Jurnal Sekarang →</a>
                 </div>
             </div>
 
@@ -83,7 +83,7 @@
                     <p style="margin: 0 0 14px; color: var(--muted); font-size: 11px; line-height: 1.5;">
                         Kamu makin konsisten merawat skin barrier. Tetap semangat mencapai kulit impian mu!
                     </p>
-                    <button type="button" class="button button-secondary" style="font-size: 10px; height: 32px; padding: 0 16px; border-radius: 99px; background: white; color: #ab2c5d; border-color: #f7d5de;">
+                    <button type="button" data-share-achievement class="button button-secondary" style="font-size: 10px; height: 32px; padding: 0 16px; border-radius: 99px; background: white; color: #ab2c5d; border-color: #f7d5de;">
                         📢 Bagikan Pencapaian
                     </button>
                 </div>
@@ -106,5 +106,73 @@
 
     </div>
 
+    <p id="notification-feedback" role="status" aria-live="polite" hidden style="margin: 0; color: var(--rose); font-size: 11px;"></p>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const feedback = document.getElementById('notification-feedback');
+        const warningCard = document.querySelector('[data-notification="skin-warning"]');
+        const dismissedKey = 'fitmyskin.notifications.skin-warning-dismissed';
+
+        const showFeedback = (message) => {
+            if (feedback) {
+                feedback.textContent = message;
+                feedback.hidden = false;
+            }
+        };
+
+        try {
+            if (window.localStorage.getItem(dismissedKey) === 'true' && warningCard) {
+                warningCard.hidden = true;
+                warningCard.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Status notifikasi tidak dapat dibaca.', error);
+            showFeedback('Status notifikasi tidak dapat dibaca dari penyimpanan browser.');
+        }
+
+        document.querySelector('[data-dismiss-notification]')?.addEventListener('click', () => {
+            try {
+                window.localStorage.setItem(dismissedKey, 'true');
+                if (warningCard) {
+                    warningCard.hidden = true;
+                    warningCard.style.display = 'none';
+                }
+                showFeedback('Notifikasi ditandai sudah dipahami.');
+            } catch (error) {
+                console.error('Status notifikasi tidak dapat disimpan.', error);
+                showFeedback('Notifikasi belum tersimpan. Periksa penyimpanan browser lalu coba lagi.');
+            }
+        });
+
+        document.querySelector('[data-share-achievement]')?.addEventListener('click', async () => {
+            const shareData = {
+                title: 'FitMySkin',
+                text: 'Aku sudah menjaga rutinitas skincare selama 5 hari bersama FitMySkin!',
+                url: window.location.origin,
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                    showFeedback('Pencapaian berhasil dibagikan.');
+                    return;
+                }
+
+                await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+                showFeedback('Teks pencapaian disalin. Kamu bisa membagikannya.');
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    return;
+                }
+
+                console.error('Pencapaian tidak dapat dibagikan.', error);
+                showFeedback('Pencapaian tidak dapat dibagikan dari browser ini.');
+            }
+        });
+    });
+</script>
+@endpush
 @endsection

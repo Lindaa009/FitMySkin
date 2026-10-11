@@ -77,6 +77,24 @@
         products = starterProducts;
         saveCollection(PRODUCT_KEY, products);
     }
+    const now = Date.now();
+    let expiredPause = false;
+    products = products.map((product) => {
+        if (product.status !== 'paused' || typeof product.pausedUntil !== 'string') {
+            return product;
+        }
+        const pausedUntil = Date.parse(product.pausedUntil);
+        if (!Number.isFinite(pausedUntil) || pausedUntil > now) {
+            return product;
+        }
+        expiredPause = true;
+        const activeProduct = { ...product };
+        delete activeProduct.pausedUntil;
+        return { ...activeProduct, status: 'active' };
+    });
+    if (expiredPause) {
+        saveCollection(PRODUCT_KEY, products);
+    }
 
     function makeId() {
         return typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
@@ -181,7 +199,7 @@
             toggle.setAttribute('aria-label', `${product.status === 'active' ? 'Istirahatkan' : 'Gunakan kembali'} ${product.name}`);
             toggle.addEventListener('click', () => {
                 products = products.map((item) => item.id === product.id
-                    ? { ...item, status: item.status === 'active' ? 'paused' : 'active' }
+                    ? { ...item, status: item.status === 'active' ? 'paused' : 'active', pausedUntil: null }
                     : item);
                 if (saveProducts()) notify(`${product.name} ${product.status === 'active' ? 'diistirahatkan' : 'digunakan kembali'}.`);
                 renderCatalog();
@@ -429,7 +447,8 @@
         toggle.addEventListener('click', () => {
             const isOpen = toggle.getAttribute('aria-expanded') === 'true';
             toggle.setAttribute('aria-expanded', String(!isOpen));
-            toggle.setAttribute('aria-label', isOpen ? 'Buka navigasi' : 'Tutup navigasi');
+            toggle.setAttribute('aria-label', isOpen ? 'Buka menu navigasi' : 'Tutup menu navigasi');
+            toggle.querySelector('.nav-toggle-label').textContent = isOpen ? 'Menu' : 'Tutup';
             navigation.classList.toggle('is-open', !isOpen);
         });
     }

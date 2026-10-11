@@ -11,17 +11,18 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
-Route::get('/notifikasi', function () {
-    return view('notifikasi');
-})->name('notifikasi');
+    Route::get('/notifikasi', function () {
+        return view('notifikasi');
+    })->name('notifikasi');
 
-Route::get('/profil', function () {
-    return view('profil');
-})->name('profil');
+    Route::get('/profil', function () {
+        return view('profil');
+    })->name('profil');
 
-Route::get('/profil/kelola-langkah', function () {
-    return view('kelola-langkah');
-})->name('profil.langkah');
+    Route::get('/profil/kelola-langkah', function () {
+        return view('kelola-langkah');
+    })->name('profil.langkah');
+});
 
 Route::view('/katalog', 'katalog.index')->name('katalog');
 Route::view('/jurnal/pagi', 'jurnal.pagi')->name('jurnal.pagi');

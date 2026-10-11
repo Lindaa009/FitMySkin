@@ -16,25 +16,27 @@
     <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-pink-100 px-8 py-3">
         <div class="max-w-[1200px] mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-[#AB2C5D] rounded-full flex items-center justify-center text-white font-bold text-xs">FMS</div>
-                <span class="font-extrabold text-lg text-[#AB2C5D]">FitMySkin</span>
+                <a href="{{ route('dashboard') }}" class="w-8 h-8 bg-[#AB2C5D] rounded-full flex items-center justify-center text-white font-bold text-xs" aria-label="Buka dashboard">FMS</a>
+                <a href="{{ route('dashboard') }}" class="font-extrabold text-lg text-[#AB2C5D]">FitMySkin</a>
             </div>
             
             <nav class="flex gap-6 text-sm font-semibold text-gray-600">
-                <a href="#" class="hover:text-[#AB2C5D]">Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="hover:text-[#AB2C5D]">Dashboard</a>
                 <a href="{{ route('katalog') }}" class="hover:text-[#AB2C5D]">Katalog Produk</a>
                 <a href="{{ route('jurnal.pagi') }}" class="hover:text-[#AB2C5D]">Jurnal Kulit</a>
                 <a href="{{ route('jurnal.riwayat') }}" class="hover:text-[#AB2C5D]">Riwayat Jurnal</a>
-                <a href="#" class="text-white bg-[#AB2C5D] px-3 py-1 rounded-full flex items-center font-bold">Analisis Kecocokan</a>
+                <a href="{{ route('analisis.kecocokan') }}" class="text-white bg-[#AB2C5D] px-3 py-1 rounded-full flex items-center font-bold" aria-current="page">Analisis Kecocokan</a>
             </nav>
             
             <div class="flex items-center gap-3">
                 <span class="bg-pink-100 text-[#AB2C5D] text-xs px-3 py-1 rounded-full font-bold">🔥 5 Hari Streak</span>
-                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold">C</div>
-                <div class="text-xs">
+                <a href="{{ route('profil') }}" class="flex items-center gap-2 text-xs" aria-label="Buka profil Clara">
+                    <span class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold">C</span>
+                    <span>
                     <p class="font-bold">Clara</p>
                     <p class="text-gray-400 text-[10px]">Normal / Kombinasi</p>
-                </div>
+                    </span>
+                </a>
             </div>
         </div>
     </header>
@@ -85,9 +87,10 @@
                         Frekuensi: 1x pemakaian, langsung memicu iritasi
                     </div>
 
+                    <p id="analysis-feedback" role="status" aria-live="polite" hidden class="text-xs text-[#862348]"></p>
                     <div class="flex gap-3 pt-2">
-                        <button class="flex-1 bg-[#F06292] text-[#5E002B] py-2.5 rounded-full font-bold text-xs hover:opacity-90">Istirahatkan Produk (7 Hari)</button>
-                        <button class="flex-1 bg-[#FFD9E2] text-[#38091D] py-2.5 rounded-full font-bold text-xs hover:opacity-90">Tandai Stop di Katalog</button>
+                        <button type="button" id="pause-suspect-product" class="flex-1 bg-[#F06292] text-[#5E002B] py-2.5 rounded-full font-bold text-xs hover:opacity-90">Istirahatkan Produk (7 Hari)</button>
+                        <button type="button" id="stop-suspect-product" class="flex-1 bg-[#FFD9E2] text-[#38091D] py-2.5 rounded-full font-bold text-xs hover:opacity-90">Tandai Stop di Katalog</button>
                     </div>
                 </div>
 
@@ -264,5 +267,52 @@
         <p><b class="text-[#AB2C5D]">FitMySkin</b> © 2026 FitMySkin Skincare Tracker. Ritual cantik setiap hari.</p>
     </footer>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const feedback = document.getElementById('analysis-feedback');
+        const productKey = 'fitmyskin.products.v1';
+        const targetName = 'Glycolic Acid Exfoliating Brightening';
+
+        const showFeedback = (message) => {
+            feedback.textContent = message;
+            feedback.hidden = false;
+        };
+
+        const pauseProduct = (redirectToCatalog) => {
+            try {
+                const products = JSON.parse(window.localStorage.getItem(productKey) || '[]');
+                if (!Array.isArray(products)) {
+                    throw new Error('Format katalog tidak sesuai.');
+                }
+
+                const productIndex = products.findIndex((product) =>
+                    typeof product?.name === 'string' && product.name.toLocaleLowerCase('id').includes(targetName.toLocaleLowerCase('id'))
+                );
+                if (productIndex === -1) {
+                    showFeedback('Produk belum ada di katalog. Tambahkan produk terlebih dahulu.');
+                    return;
+                }
+
+                products[productIndex] = {
+                    ...products[productIndex],
+                    status: 'paused',
+                    pausedUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                };
+                window.localStorage.setItem(productKey, JSON.stringify(products));
+                if (redirectToCatalog) {
+                    window.location.assign(@json(route('katalog')));
+                    return;
+                }
+                showFeedback('Produk diistirahatkan selama 7 hari di katalog browser ini.');
+            } catch (error) {
+                console.error('Status produk tidak dapat diperbarui.', error);
+                showFeedback('Status produk belum tersimpan. Periksa penyimpanan browser lalu coba lagi.');
+            }
+        };
+
+        document.getElementById('pause-suspect-product')?.addEventListener('click', () => pauseProduct(false));
+        document.getElementById('stop-suspect-product')?.addEventListener('click', () => pauseProduct(true));
+    });
+</script>
 </body>
 </html>

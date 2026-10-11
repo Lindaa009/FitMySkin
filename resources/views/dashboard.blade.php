@@ -4,11 +4,11 @@
 @section('page', 'dashboard')
 
 @section('content')
-<div style="max-width: 1120px; margin: 0 auto; display: grid; gap: 24px;">
+<div class="dashboard-page" style="max-width: 1120px; margin: 0 auto; display: grid; gap: 24px;">
 
     <!-- 1. KARTU SAPAAN UTAMA (BANNER) -->
-    <div class="journal-card" style="padding: 32px; border-radius: 28px; background: linear-gradient(135deg, #fff0f3 0%, #fff7f5 100%); border-color: #f6e4e6; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
-        <div>
+    <div class="dashboard-hero journal-card" style="padding: 32px; border-radius: 28px; background: linear-gradient(135deg, #fff0f3 0%, #fff7f5 100%); border-color: #f6e4e6; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+        <div class="dashboard-hero-copy">
             <p class="eyebrow"><span class="eyebrow-dot"></span> PAGI HARI • RITUAL PERCAYA DIRI</p>
             <h1 style="margin: 8px 0 10px; font-size: clamp(24px, 3.5vw, 32px); font-weight: 800; letter-spacing: -1px; color: var(--ink);">
                 Selamat Datang Kembali, <br>Clara! 🌸✨
@@ -17,7 +17,7 @@
                 Kulitmu bersinar sehat hari ini. Lanjutkan rutinitas lembutmu dan perhatikan respon kulit terhadap cuaca lembap pagi ini!
             </p>
         </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class="dashboard-hero-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
             <!-- Tambah Produk -> Katalog -->
             <a href="{{ route('katalog') }}" class="button button-primary" style="background: var(--rose); border-radius: 99px; padding: 0 20px; font-size: 11px;">
                 + Tambah Produk Baru
@@ -30,10 +30,10 @@
     </div>
 
     <!-- 2. KARTU STATISTIK ATAS (Konsistensi, Kepatuhan, Pekan Ini) -->
-    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;">
+    <div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;">
         
         <!-- Konsistensi -->
-        <div class="journal-card" style="padding: 20px 24px; border-radius: 22px; display: flex; align-items: center; gap: 16px;">
+        <div class="dashboard-stat dashboard-stat-streak journal-card" style="padding: 20px 24px; border-radius: 22px; display: flex; align-items: center; gap: 16px;">
             <div style="width: 48px; height: 48px; border-radius: 16px; background: var(--rose-pale); display: grid; place-items: center; color: var(--rose); font-size: 20px;">
                 🔥
             </div>
@@ -48,7 +48,7 @@
         </div>
 
         <!-- Kepatuhan Rutin -->
-        <div class="journal-card" style="padding: 20px 24px; border-radius: 22px; display: flex; align-items: center; justify-content: space-between;">
+        <div class="dashboard-stat dashboard-stat-compliance journal-card" style="padding: 20px 24px; border-radius: 22px; display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 16px;">
                 <div style="width: 48px; height: 48px; border-radius: 16px; background: #eef7f2; display: grid; place-items: center; color: var(--green); font-size: 20px;">
                     🛡️
@@ -63,12 +63,12 @@
         </div>
 
         <!-- Pekan Ini -->
-        <div class="journal-card" style="padding: 20px 20px; border-radius: 22px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span style="font-size: 8px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px;">PEKAN INI • OKTOBER 2026</span>
+        <div class="dashboard-stat dashboard-stat-week journal-card" style="padding: 20px 20px; border-radius: 22px;">
+            <div class="dashboard-week-heading" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 8px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px;">PEKAN INI</span>
                 <span style="font-size: 9px; font-weight: 700; color: var(--rose);">5 dari 7 Hari Lengkap</span>
             </div>
-            <div style="display: flex; justify-content: space-between; text-align: center;">
+            <div class="dashboard-week-days" style="display: flex; justify-content: space-between; text-align: center;">
                 <div>
                     <span style="display: block; font-size: 8px; color: var(--muted); margin-bottom: 4px;">Sen</span>
                     <span style="width: 24px; height: 24px; border-radius: 50%; background: var(--rose-pale); color: var(--rose); font-size: 10px; display: inline-grid; place-items: center;">♥</span>
@@ -103,19 +103,19 @@
     </div>
 
     <!-- 3. GRID KONTEN UTAMA (KIRI & KANAN) -->
-    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start;">
+    <div class="dashboard-content" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start;">
 
         <!-- KOLOM KIRI -->
         <div style="display: grid; gap: 24px;">
 
             <!-- Jurnal Hari Ini -->
-            <div class="journal-card" style="padding: 24px; border-radius: 22px;">
+            <div class="dashboard-panel dashboard-journal-panel journal-card" style="padding: 24px; border-radius: 22px;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                     <div>
                         <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--ink); display: flex; align-items: center; gap: 8px;">
                             📖 Jurnal Hari Ini
                         </h3>
-                        <p style="margin: 2px 0 0; font-size: 10px; color: var(--muted);">Jumat, 24 Oktober 2026</p>
+                        <p style="margin: 2px 0 0; font-size: 10px; color: var(--muted);"><time id="dashboard-date">Hari ini</time></p>
                     </div>
                     <span style="background: var(--rose-pale); color: var(--rose); padding: 4px 12px; border-radius: 99px; font-size: 9px; font-weight: 800;">
                         Pagi Selesai, Malam Belum Diisi 🍷
@@ -170,7 +170,7 @@
                     </span>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 140px 1fr; gap: 20px; align-items: center; background: #faf5f3; padding: 20px; border-radius: 18px; margin-bottom: 14px;">
+                <div class="dashboard-skin-summary" style="display: grid; grid-template-columns: 140px 1fr; gap: 20px; align-items: center; background: #faf5f3; padding: 20px; border-radius: 18px; margin-bottom: 14px;">
                     <div style="text-align: center; border-right: 1px solid var(--line); padding-right: 15px;">
                         <span style="display: block; font-size: 8px; color: var(--muted); font-weight: 800; text-transform: uppercase;">BARRIER HEALTH</span>
                         <strong style="display: block; font-size: 32px; font-weight: 800; color: var(--green); line-height: 1.1; margin: 4px 0;">88</strong>
@@ -225,11 +225,11 @@
         <div style="display: grid; gap: 24px;">
 
             <!-- Koleksi Skincare -->
-            <div class="journal-card" style="padding: 24px; border-radius: 22px;">
+            <div class="dashboard-panel dashboard-collection-panel journal-card" style="padding: 24px; border-radius: 22px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                     <div>
                         <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--ink);">📦 Koleksi Skincare</h3>
-                        <p style="margin: 2px 0 0; font-size: 10px; color: var(--muted);">Total 7 Produk Terdaftar</p>
+                        <p style="margin: 2px 0 0; font-size: 10px; color: var(--muted);">Total <span data-dashboard-product-total>4</span> Produk Terdaftar</p>
                     </div>
                     <!-- Kelola Lemari -> Katalog -->
                     <a href="{{ route('katalog') }}" style="color: var(--rose); font-size: 10px; font-weight: 800; text-decoration: none;">Kelola Lemari →</a>
@@ -238,14 +238,14 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                     <div style="background: #faf5f3; border: 1px solid var(--line); padding: 16px; border-radius: 16px; text-align: center;">
                         <span style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: #eef7f2; color: var(--green); font-size: 12px; line-height: 24px; margin-bottom: 6px;">✓</span>
-                        <strong style="display: block; font-size: 20px; font-weight: 800; color: var(--ink);">5</strong>
+                        <strong data-dashboard-active-products style="display: block; font-size: 20px; font-weight: 800; color: var(--ink);">3</strong>
                         <span style="font-size: 10px; font-weight: 800; color: var(--ink);">Sedang Aktif</span>
                         <p style="margin: 2px 0 0; font-size: 8px; color: var(--muted);">Dipakai rutin harian</p>
                     </div>
 
                     <div style="background: #faf5f3; border: 1px solid var(--line); padding: 16px; border-radius: 16px; text-align: center;">
                         <span style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: #fdf2f4; color: var(--rose); font-size: 12px; line-height: 24px; margin-bottom: 6px;">⏸</span>
-                        <strong style="display: block; font-size: 20px; font-weight: 800; color: var(--ink);">2</strong>
+                        <strong data-dashboard-paused-products style="display: block; font-size: 20px; font-weight: 800; color: var(--ink);">1</strong>
                         <span style="font-size: 10px; font-weight: 800; color: var(--ink);">Stop / Dijeda</span>
                         <p style="margin: 2px 0 0; font-size: 8px; color: var(--muted);">Dalam pengujian alergi</p>
                     </div>
@@ -254,10 +254,11 @@
                 <div style="background: #faf5f3; padding: 10px 14px; border-radius: 12px; text-align: center;">
                     <p style="margin: 0; font-size: 9px; color: var(--muted); font-weight: 700;">Semua aman dicatat</p>
                 </div>
+                <p id="dashboard-storage-feedback" role="status" aria-live="polite" hidden style="margin: 8px 0 0; color: var(--rose); font-size: 10px;"></p>
             </div>
 
             <!-- Analisis Kecocokan -->
-            <div class="journal-card" style="padding: 24px; border-radius: 22px;">
+            <div class="dashboard-panel dashboard-analysis-panel journal-card" style="padding: 24px; border-radius: 22px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                     <div>
                         <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--ink);">🔍 Analisis Kecocokan</h3>
@@ -307,4 +308,55 @@
     </div>
 
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const dateLabel = document.getElementById('dashboard-date');
+        if (dateLabel) {
+            dateLabel.dateTime = new Date().toISOString().slice(0, 10);
+            dateLabel.textContent = new Intl.DateTimeFormat('id-ID', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+            }).format(new Date());
+        }
+
+        try {
+            const products = JSON.parse(window.localStorage.getItem('fitmyskin.products.v1') || 'null');
+            if (Array.isArray(products) && products.every((product) => product && ['active', 'paused'].includes(product.status))) {
+                const currentTime = Date.now();
+                let expiredPause = false;
+                const currentProducts = products.map((product) => {
+                    const pausedUntil = typeof product.pausedUntil === 'string' ? Date.parse(product.pausedUntil) : Number.NaN;
+                    if (product.status !== 'paused' || !Number.isFinite(pausedUntil) || pausedUntil > currentTime) {
+                        return product;
+                    }
+
+                    expiredPause = true;
+                    const activeProduct = { ...product };
+                    delete activeProduct.pausedUntil;
+                    return { ...activeProduct, status: 'active' };
+                });
+
+                if (expiredPause) {
+                    window.localStorage.setItem('fitmyskin.products.v1', JSON.stringify(currentProducts));
+                }
+                document.querySelector('[data-dashboard-product-total]').textContent = String(currentProducts.length);
+                document.querySelector('[data-dashboard-active-products]').textContent = String(currentProducts.filter((product) => product.status === 'active').length);
+                document.querySelector('[data-dashboard-paused-products]').textContent = String(currentProducts.filter((product) => product.status === 'paused').length);
+            }
+        } catch (error) {
+            console.error('Ringkasan katalog tidak dapat dibaca.', error);
+            const storageFeedback = document.getElementById('dashboard-storage-feedback');
+            if (storageFeedback) {
+                storageFeedback.textContent = 'Ringkasan produk tidak dapat diperbarui dari penyimpanan browser.';
+                storageFeedback.hidden = false;
+                storageFeedback.style.display = 'block';
+            }
+        }
+    });
+</script>
+@endpush
 @endsection
