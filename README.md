@@ -1,58 +1,237 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🌸 FitMySkin — Skincare Tracker & Skin Journal
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**FitMySkin** adalah aplikasi web untuk melacak rutinitas skincare, mencatat kondisi kulit harian, dan menganalisis kecocokan produk terhadap kulitmu. Dibuat sebagai project kolaborasi dengan fokus pada **analisis korelasi produk vs reaksi kulit**.
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/Laravel-13.x-red)
+![PHP](https://img.shields.io/badge/PHP-8.3-blue)
+![MySQL](https://img.shields.io/badge/MySQL-8.x-orange)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-3.x-cyan)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🔐 Autentikasi
+- Register & Login dengan email + password
+- Session-based authentication (Laravel Auth)
+- Edit profil & ganti password
 
-## Learning Laravel
+### 📚 Katalog Produk
+- Tambah, edit, hapus produk skincare
+- Kategorisasi produk (Cleanser, Toner, Serum, Moisturizer, Sunscreen, Exfoliator)
+- Status produk: Aktif / Diistirahatkan
+- Filter & search produk
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 📖 Jurnal Kulit
+- Catat jurnal pagi & malam
+- Pilih produk yang dipakai + kondisi kulit (Nyaman, Kering, Berminyak, Kemerahan, Perih)
+- Tambah catatan & gejala (Gatal, Bruntusan, Mengelupas)
+- Riwayat jurnal dengan search & filter
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 📊 Analisis Kecocokan
+- **Deteksi Produk Pemicu Iritasi** — analisis produk yang dipakai 3 hari sebelum iritasi muncul
+- **Streak** — hitung berapa hari berturut-turut user mencatat jurnal
+- **Frekuensi kondisi kulit** — persentase kondisi kulit user
+- **Smart Warning** — notifikasi cerdas saat produk keras dipakai berlebihan
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 🎯 Kelola Langkah Skincare
+- Atur urutan langkah skincare pagi & malam
+- Drag & drop untuk reorder
+- Sinkronisasi dengan halaman jurnal (step number otomatis)
 
-## Agentic Development
+### 🔔 Notifikasi
+- Peringatan dini pemicu iritasi
+- Pengingat ritual malam
+- Streak booster
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 📄 Export PDF
+- Download riwayat jurnal sebagai file PDF
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Teknologi |
+|-------|-----------|
+| **Backend** | Laravel 13, PHP 8.3 |
+| **Database** | MySQL 8 |
+| **Frontend** | Blade Template, TailwindCSS (via CDN) |
+| **PDF Export** | barryvdh/laravel-dompdf |
+| **Icons** | Emoji & SVG |
+| **Fonts** | Plus Jakarta Sans |
+
+---
+
+## 📋 Persyaratan Sistem
+
+Sebelum install, pastikan udah ada:
+
+- **PHP** ≥ 8.3
+- **Composer** ≥ 2.x
+- **MySQL** ≥ 8.0
+- **Node.js** (opsional, untuk asset compile)
+- **XAMPP / Laragon** (untuk development lokal)
+
+---
+
+## 🚀 Cara Install & Jalankan
+
+### 1. Clone Repository
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/Lindaa009/FitMySkin.git
+cd FitMySkin
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Install Dependencies
 
-## Contributing
+```bash
+composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Copy `.env` File
 
-## Code of Conduct
+```bash
+copy .env.example .env
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Generate Application Key
 
-## Security Vulnerabilities
+```bash
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 5. Setup Database
 
-## License
+Buat database baru di MySQL dengan nama **`fitmyskin`**:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```sql
+CREATE DATABASE fitmyskin;
+```
+
+Kemudian import file SQL (kalau disediakan):
+
+```bash
+mysql -u root -p fitmyskin < database/fitmyskin.sql
+```
+
+### 6. Konfigurasi `.env`
+
+Buka file `.env`, sesuaikan bagian database:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=fitmyskin
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 7. Buat Storage Link
+
+Untuk upload foto profil:
+
+```bash
+php artisan storage:link
+```
+
+### 8. Jalankan Server
+
+```bash
+php artisan serve
+```
+
+Buka browser: **http://127.0.0.1:8000**
+
+---
+
+## 📁 Struktur Folder Penting
+
+```
+FitMySkin/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── AuthController.php          # Login & Register
+│   │   ├── ProductController.php       # CRUD Produk
+│   │   ├── JournalController.php       # Jurnal + Export PDF
+│   │   ├── AnalisisController.php      # Analisis Streak & Iritasi
+│   │   ├── RoutineController.php       # Kelola Langkah
+│   │   ├── ProfileController.php       # Profil + Avatar
+│   │   ├── DashboardController.php     # Dashboard
+│   │   └── NotifikasiController.php    # Notifikasi Cerdas
+│   └── Models/
+│       ├── User.php
+│       ├── Product.php
+│       ├── Journal.php
+│       └── Routine.php
+├── database/
+│   └── (migration & seeder)
+├── public/
+│   ├── css/fitmyskin.css
+│   └── js/fitmyskin.js
+├── resources/views/
+│   ├── layouts/app.blade.php           # Layout utama
+│   ├── Jurnal/                         # Halaman jurnal
+│   ├── Analisis/                       # Halaman analisis
+│   ├── katalog/                        # Halaman katalog
+│   ├── auth/                           # Login & register
+│   ├── errors/404.blade.php            # Halaman 404
+│   └── ...
+└── routes/web.php                      # Semua route
+```
+
+---
+
+## 🗄️ Skema Database
+
+| Tabel | Fungsi |
+|-------|--------|
+| `users` | Data user (nama, email, password, tipe kulit, concerns, alergi, foto) |
+| `product` | Produk skincare user (nama, merek, bahan aktif, jenis, jadwal, status) |
+| `jurnal` | Catatan harian (tanggal, kondisi kulit, jadwal, produk, catatan) |
+| `urutan_skincare` | Urutan langkah rutinitas pagi & malam (JSON) |
+
+---
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Analisis Kecocokan
+![Analisis](screenshots/analisis.png)
+```
+
+---
+
+## 👥 Kontributor
+
+| Nama | Peran |
+|------|-------|
+| **Dian Kamilah** | UI/UX Design |
+| **Raenuha** | Database Administrator |
+| **Linda Rahmasari** | Frontend Developer |
+| **Palupi Eka Wardani** | Frontend Developer |
+| **Siti Komariah** | Backend Developer |
+
+---
+
+## 📄 Lisensi
+
+Project ini dibuat untuk keperluan **tugas akademik**. Tidak untuk penggunaan komersial tanpa izin.
+
+---
+
+## 🙏 Ucapan Terima Kasih
+
+- Laravel Community
+- TailwindCSS
+- Plus Jakarta Sans (Google Fonts)
+- Semua pihak yang membantu project ini
+
+---
+
+<p align="center">
+    Dibuat dengan 💖 untuk kulit sehat Indonesia
+    <br>
+    <b>FitMySkin</b> © 2026
+</p>
