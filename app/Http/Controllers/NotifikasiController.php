@@ -20,7 +20,27 @@ class NotifikasiController extends Controller
             $notifikasi[] = $warning;
         }
 
-        // ─── 2. Ritual Malam ───
+        // ─── 2. Ritual Pagi ───
+        $sudahIsiPagi = Journal::where('id_user', $userId)
+            ->whereDate('tanggal_pemakaian', Carbon::today())
+            ->where('jadwal_pemakaian', 'Siang')
+            ->exists();
+
+        if (!$sudahIsiPagi) {
+            $notifikasi[] = [
+                'tipe' => 'ritual',
+                'icon' => '☀️',
+                'label' => 'RITUAL PAGI',
+                'waktu' => 'Belum diisi',
+                'judul' => 'Waktunya Rutinitas Pagi! 🌸',
+                'pesan' => 'Awali harimu dengan merawat kulitmu. Yuk catat jurnal pagi sekarang biar streak-mu aman!',
+                'aksi_link' => route('jurnal.pagi'),
+                'aksi_text' => 'Isi Jurnal Pagi →',
+                'aksi_style' => 'primary',
+            ];
+        }
+
+        // ─── 3. Ritual Malam ───
         $sudahIsiMalam = Journal::where('id_user', $userId)
             ->whereDate('tanggal_pemakaian', Carbon::today())
             ->where('jadwal_pemakaian', 'Malam')
@@ -35,12 +55,12 @@ class NotifikasiController extends Controller
                 'judul' => 'Waktunya Ritual Skincare Malam! 💖',
                 'pesan' => 'Pukul 21:00 WIB. Kulitmu butuh nutrisi sebelum tidur pulas. Yuk catat jurnal malam sekarang!',
                 'aksi_link' => route('jurnal.malam'),
-                'aksi_text' => 'Buka Jurnal Sekarang →',
+                'aksi_text' => 'Isi Jurnal Malam →',
                 'aksi_style' => 'primary',
             ];
         }
 
-        // ─── 3. Streak Booster ───
+        // ─── 4. Streak Booster ───
         $streak = $this->hitungStreak($userId);
         if ($streak > 0) {
             $notifikasi[] = [
