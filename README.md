@@ -8,30 +8,30 @@
 ![TailwindCSS](https://img.shields.io/badge/Tailwind-3.x-cyan)
 
 **✨ Fitur Utama**
-🔐 Autentikasi
+##🔐 Autentikasi
 - Register & Login dengan email + password
 - Session-based authentication (Laravel Auth)
 - Edit profil & ganti password
-📚 Katalog Produk
+##📚 Katalog Produk
 - Tambah, edit, hapus produk skincare
 - Kategorisasi produk (Cleanser, Toner, Serum, Moisturizer, Sunscreen, Exfoliator)
 - Status produk: Aktif / Diistirahatkan
 - Filter & search produk
-📖 Jurnal Kulit
+##📖 Jurnal Kulit
 - Catat jurnal pagi & malam
 - Pilih produk yang dipakai + kondisi kulit (Nyaman, Kering, Berminyak, Kemerahan, Perih)
 - Tambah catatan & gejala (Gatal, Bruntusan, Mengelupas)
 - Riwayat jurnal dengan search & filter
- 📊 Analisis Kecocokan
+##📊 Analisis Kecocokan
 - **Deteksi Produk Pemicu Iritasi** — analisis produk yang dipakai 3 hari sebelum iritasi muncul
 - **Streak** — hitung berapa hari berturut-turut user mencatat jurnal
 - **Frekuensi kondisi kulit** — persentase kondisi kulit user
 - **Smart Warning** — notifikasi cerdas saat produk keras dipakai berlebihan
-🎯 Kelola Langkah Skincare
+##🎯 Kelola Langkah Skincare
 - Atur urutan langkah skincare pagi & malam
 - Drag & drop untuk reorder
 - Sinkronisasi dengan halaman jurnal (step number otomatis)
-🔔 Notifikasi
+##🔔 Notifikasi
 - Peringatan dini pemicu iritasi
 - Pengingat ritual malam
 - Streak booster
