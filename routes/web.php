@@ -4,7 +4,6 @@ use App\Http\Controllers\AnalisisController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JournalController;
-use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoutineController;
@@ -37,7 +36,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Halaman lain
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
     Route::get('/profil', [ProfileController::class, 'index'])->name('profil');
     Route::put('/profil', [ProfileController::class, 'update'])->name('profil.update');
     Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profil.password');

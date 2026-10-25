@@ -42,11 +42,6 @@
         </div>
 
         @if ($currentUser)
-            <!-- Tombol Notifikasi -->
-            <a href="{{ route('notifikasi') }}" style="width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: white; display: grid; place-items: center; text-decoration: none; color: var(--muted); transition: background 0.2s; flex-shrink: 0;" title="Notifikasi">
-                🔔
-            </a>
-
             <!-- Profil Pengguna -->
             <a href="{{ route('profil') }}" style="display: flex; align-items: center; gap: 8px; background: white; border: 1px solid var(--line); padding: 4px 14px 4px 4px; border-radius: 999px; text-decoration: none; color: inherit; white-space: nowrap;">
                 @if ($currentUser->foto_profil)

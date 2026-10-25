@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Product;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -49,10 +50,11 @@ class SkincarePagesTest extends TestCase
             ->assertSee('Profil')
             ->assertSee(route('dashboard'), false)
             ->assertSee(route('profil'), false)
-            ->assertSee('class="nav-toggle-label">Menu</span>', false);
+            ->assertSee('aria-label="Buka navigasi"', false)
+            ->assertSee('aria-controls="main-navigation"', false);
     }
 
-    public function test_profile_and_notifications_are_available_to_authenticated_users(): void
+    public function test_profile_is_available_to_authenticated_users(): void
     {
         $user = new User;
         $user->setAttribute('id_user', 1);
@@ -62,17 +64,20 @@ class SkincarePagesTest extends TestCase
             ->assertOk()
             ->assertSee('Informasi Personal')
             ->assertSee('data-skin-type="Normal"', false)
-            ->assertSee('data-profile-group="concerns"', false)
-            ->assertSee('data-profile-group="allergies"', false);
+            ->assertSee('id="concerns-container"', false)
+            ->assertSee('id="alergi-container"', false)
+            ->assertSee('id="btn-add-concern"', false)
+            ->assertSee('id="btn-add-alergi"', false);
+    }
+
+    public function test_notifications_page_is_removed(): void
+    {
+        $user = new User;
+        $user->setAttribute('id_user', 1);
 
         $this->actingAs($user)
             ->get('/notifikasi')
-            ->assertOk()
-            ->assertSee('Notifikasi & Pengingat Cantik')
-            ->assertSee(route('analisis.kecocokan'), false)
-            ->assertSee(route('jurnal.malam'), false)
-            ->assertSee('data-share-achievement', false)
-            ->assertDontSee('href="#"');
+            ->assertNotFound();
     }
 
     public function test_routine_page_exposes_working_controls_for_demo(): void
@@ -83,34 +88,60 @@ class SkincarePagesTest extends TestCase
         $this->actingAs($user)
             ->get('/profil/kelola-langkah')
             ->assertOk()
-            ->assertSee('reset-routine', false)
-            ->assertSee('insert-routine-step', false)
-            ->assertSee('fitmyskin.routines.v1')
-            ->assertSee('routine-step-type', false)
-            ->assertSee('save-routine', false);
+            ->assertSee('id="btn-reset-routine"', false)
+            ->assertSee('id="add-step-select"', false)
+            ->assertSee('Sisipkan')
+            ->assertSee('let routineData =')
+            ->assertSee("fetch('/routines'", false)
+            ->assertSee('id="btn-save-routine"', false);
     }
 
-    public function test_analysis_actions_have_real_navigation_and_product_controls(): void
+    public function test_analysis_page_shows_recommendations_and_navigation(): void
     {
         $this->get('/analisis/kecocokan')
             ->assertOk()
             ->assertSee(route('dashboard'), false)
-            ->assertSee(route('profil'), false)
-            ->assertSee('pause-suspect-product', false)
-            ->assertSee('stop-suspect-product', false)
+            ->assertSee(route('jurnal.riwayat'), false)
+            ->assertSee('Analisis Kecocokan Produk & Iritasi', false)
+            ->assertSee('Rekomendasi Berdasarkan Data Jurnalmu')
+            ->assertSee('Belum Ada Pemicu Iritasi Terdeteksi')
             ->assertDontSee('href="#"');
     }
 
-    public function test_dashboard_product_summary_matches_demo_catalog_defaults(): void
+    public function test_dashboard_product_summary_matches_the_users_products(): void
     {
-        $user = new User;
-        $user->setAttribute('id_user', 1);
+        $user = User::query()->create([
+            'nama_user' => 'Test User',
+            'alamat_email' => 'dashboard@example.test',
+            'password' => 'password',
+        ]);
+
+        Product::query()->create([
+            'id_user' => $user->id_user,
+            'nama_produk' => 'Cleanser',
+            'merek' => 'Test Brand',
+            'jenis_produk' => 'Cleanser',
+            'jadwal_pemakaian' => 'Siang',
+            'status_pemakaian' => 'Aktif',
+        ]);
+
+        Product::query()->create([
+            'id_user' => $user->id_user,
+            'nama_produk' => 'Moisturizer',
+            'merek' => 'Test Brand',
+            'jenis_produk' => 'Moisturizer',
+            'jadwal_pemakaian' => 'Malam',
+            'status_pemakaian' => 'Tidak Aktif',
+        ]);
 
         $this->actingAs($user)
             ->get('/dashboard')
             ->assertOk()
-            ->assertSee('Total <span data-dashboard-product-total>4</span> Produk Terdaftar', false)
-            ->assertSee('data-dashboard-active-products style=', false)
-            ->assertSee('data-dashboard-paused-products style=', false);
+            ->assertSee('Total 2 Produk')
+            ->assertSee('Sedang Aktif')
+            ->assertSee('Stop / Dijeda')
+            ->assertViewHas('totalProduk', 2)
+            ->assertViewHas('produkAktif', 1)
+            ->assertViewHas('produkStop', 1);
     }
 }
