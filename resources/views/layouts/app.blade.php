@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#fef8f5">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'FitMySkin') · FitMySkin</title>
+    <title>@yield('title', 'FitMySkin') - FitMySkin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,8 +14,9 @@
 </head>
 </head>
 <body data-page="@yield('page')">
+    @php $currentUser = auth()->user(); @endphp
     <header class="site-header">
-        <a class="brand" href="{{ route('dashboard') }}" aria-label="FitMySkin, dashboard">
+        <a class="brand" href="{{ route('login') }}" aria-label="FitMySkin, dashboard">
             <span class="brand-mark" aria-hidden="true">f</span>
             <span>FitMy<span class="brand-accent">Skin</span></span>
         </a>
@@ -40,6 +41,7 @@
             <span>{{ $navStreak ?? 0 }} Hari Streak ✨</span>
         </div>
 
+        @if ($currentUser)
             <!-- Tombol Notifikasi -->
             <a href="{{ route('notifikasi') }}" style="width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: white; display: grid; place-items: center; text-decoration: none; color: var(--muted); transition: background 0.2s; flex-shrink: 0;" title="Notifikasi">
                 🔔
@@ -47,15 +49,15 @@
 
             <!-- Profil Pengguna -->
             <a href="{{ route('profil') }}" style="display: flex; align-items: center; gap: 8px; background: white; border: 1px solid var(--line); padding: 4px 14px 4px 4px; border-radius: 999px; text-decoration: none; color: inherit; white-space: nowrap;">
-                @if (auth()->user()->foto_profil)
-                    <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" alt="{{ auth()->user()->nama_user }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                @if ($currentUser->foto_profil)
+                    <img src="{{ asset('storage/' . $currentUser->foto_profil) }}" alt="{{ $currentUser->nama_user }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
                 @else
                     <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--rose); color: white; display: grid; place-items: center; font-weight: 800; font-size: 13px;">
-                        {{ strtoupper(substr(auth()->user()->nama_user ?? 'U', 0, 1)) }}
+                        {{ strtoupper(substr($currentUser->nama_user ?? 'U', 0, 1)) }}
                     </div>
                 @endif
                 <div style="text-align: left; line-height: 1.2;">
-                    <span style="display: block; font-size: 11px; font-weight: 800; color: var(--ink);">{{ auth()->user()->nama_user ?? 'User' }}</span>
+                    <span style="display: block; font-size: 11px; font-weight: 800; color: var(--ink);">{{ $currentUser->nama_user ?? 'User' }}</span>
                     <span style="display: block; font-size: 9px; color: var(--muted);">FitMySkin Member</span>
                 </div>
             </a>
@@ -66,7 +68,11 @@
                     🚪 Keluar
                 </button>
             </form>
-        </div>
+        @else
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="{{ route('login') }}" style="padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: white; color: var(--ink); font-size: 11px; font-weight: 800; text-decoration: none;">Masuk</a>
+            </div>
+        @endif
     </header>
 
     <main class="page-shell">
